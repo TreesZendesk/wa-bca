@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  h1= title
+  .main.container
+    .row
+      .col-md-6.col-md-offset-3
+        form(method='POST' action='register')
+            div.form-group
+              label(for='phone') Phone Number:
+              input#name.form-control(type='text', placeholder='Phone Number (628xxx)', name='phone')
+              input#name.form-control(type='text', value=instance_push_id, name='instance_push_id', hidden)
+              input#name.form-control(type='text', value=zendesk_access_token, name='zendesk_access_token', hidden)
+              input#name.form-control(type='text', value=subdomain, name='subdomain', hidden)
+              input#name.form-control(type='text', value=locale, name='locale', hidden)
+              input#name.form-control(type='text', value=return_url, name='return_url', hidden)
+            div.form-group
+              label(for='client_secret') Client Secret:
+              input#pw.form-control(type='password' name='client_secret')
+            button.btn.btn-primary(type='submit') Submit
