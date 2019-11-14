@@ -14,10 +14,10 @@ const sequelize = new Sequelize('jendekwa', 'root', '123Abc+', {
 
 const jdDomain = jdDomainModel(sequelize, Sequelize)
 
-// sequelize.sync({ force: true })
-//   .then(() => {
-//     console.log(`Database & tables created!`)
-//   })
+sequelize.sync({ force: true })
+  .then(() => {
+    console.log(`Database & tables created!`)
+  })
 
 module.exports = {
     jdDomain
