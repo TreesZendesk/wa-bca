@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var conn = require('../db/conn');
 const request = require('request');
-
+const logger = require('../config/winston')
 
 var jendek_domain_table = 'jendek-domain';
 
@@ -27,6 +27,7 @@ router.get('/manifest', (req, res, next) => {
 
 router.post('/integration/admin', (req, res, next) => {
     console.log(req.body);
+    logger.info(JSON.stringify(req.body));
     res.render('admin', {
         title: 'CIF Admin',
         return_url: req.body.return_url,
@@ -40,6 +41,7 @@ router.post('/integration/admin', (req, res, next) => {
  /* for testing, ignore this */
 router.get('/integration/admin', (req, res, next) => {
     console.log(req.body.return_url);
+    logger.info(JSON.stringify(req.body.return_url));
     res.render('admin', {
         title: 'CIF Admin'
     });
@@ -47,6 +49,7 @@ router.get('/integration/admin', (req, res, next) => {
 
 router.post('/integration/register', (req, res, next) => {
     console.log(req.body);
+    logger.info(JSON.stringify(req.body));
     
     let metadata = {};
     metadata['instance_push_id'] = req.body.instance_push_id;
@@ -75,6 +78,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
     let msgObj = {};
 
     console.log(JSON.stringify(req.body));
+    logger.info(JSON.stringify(req.body));
     for (var i=0; i<req.body.messages.length; i++) {
         let userName = ""
         for (var j=0; j<req.body.contacts.length; j++) {
@@ -106,6 +110,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
     }
 
     console.log(externalRsrcs);
+    logger.info(JSON.stringify(externalRsrcs));
 
     var pushJendekUrl = 'https://conrokitvhelp1572418560.zendesk.com/api/v2/any_channel/push.json';
 
@@ -119,6 +124,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
         json: externalRsrcs
     }, function (err, newRes) {
         console.log(newRes.statusCode);
+        logger.info(JSON.stringify(newRes.statusCode));
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
@@ -140,6 +146,7 @@ router.post('/integration/push', (req, res, next) => {
     let msgObj = {};
 
     console.log(JSON.stringify(req.body));
+    logger.info(JSON.stringify(req.body));
     var jendekExternalId = 'wa-msg-' + req.body.to
     var jendekUserExternalId = 'wa-user-' + req.body.to
     var jendekThreadExternalId = 'wa-conv-' + req.body.to
@@ -175,6 +182,7 @@ router.post('/integration/push', (req, res, next) => {
         json: externalRsrcs
     }, function (err, newRes) {
         console.log(newRes.statusCode);
+        logger.info(JSON.stringify(newRes.statusCode));
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
