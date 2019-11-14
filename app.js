@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var proxy = require('express-http-proxy');
+var proxyNew = require('http-proxy-middleware');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -28,6 +29,8 @@ app.use('/jendek', jendekRouter);
 app.use('/wacoreproxy', proxy('192.168.29.189:9001')); 
 app.use('/cifherokuproxy/:appname', proxy(req => req.params["appname"] + ".herokuapp.com", {https: true}))
 app.use('/cifngrokproxy/:appname', proxy(req => req.params["appname"] + ".ngrok.io", {https: true}))
+app.use('/example', proxyNew({ target: 'https://example.org', changeOrigin: true }));
+app.use('/wacoreproxyv2', proxyNew({ target: 'http://192.168.29.189:9001', changeOrigin: true }));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

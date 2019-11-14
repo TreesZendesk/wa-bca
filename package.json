@@ -20,5 +20,8 @@
     "request": "^2.88.0",
     "sequelize": "^5.19.2",
     "winston-logzio": "^5.0.3"
+  },
+  "devDependencies": {
+    "http-proxy-middleware": "^0.20.0"
   }
 }

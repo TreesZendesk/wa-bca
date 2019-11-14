@@ -201,6 +201,9 @@ router.post('/integration/pull', (req, res, next) => {
 
 router.post('/integration/channelback', (req, res, next) => {
     console.log(req.body);
+    
+    // Todo 15 November
+
     res.status(200).send({
         error: "system is not ready"
     });
