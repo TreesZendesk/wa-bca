@@ -203,10 +203,33 @@ router.post('/integration/channelback', (req, res, next) => {
     console.log(req.body);
     
     // Todo 15 November
-
-    res.status(200).send({
-        error: "system is not ready"
-    });
+    request({
+        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
+        method: 'POST',
+        rejectUnauthorized: false,
+        json: {
+            "channelID": "102",
+            "terminalID": "100",
+            "sender": "KKB",
+            "customerRefNo": "999999999",
+            "review_url": false,
+            "recipient_type": "individual",
+            "to": "6282213728117",
+            "type": "text",
+            "text": {
+                "body": req.body.message
+            }
+        }
+    }, function (error, newRes) {
+        console.log(newRes.body);
+        if (newRes.body.statusDesc == "SUCCESS") {
+            res.status(200).send(newRes.body);
+        } else {
+            res.status(500).send({
+                error: "error",
+            });
+        }
+    });    
 })
 
 router.post('/integration/clickthrough', (req, res, next) => {
