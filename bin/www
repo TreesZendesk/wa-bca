@@ -16,11 +16,11 @@ var fs = require('fs');
 
 var port = normalizePort(process.env.PORT || '3000');
 
-// This line is from the Node.js HTTPS documentation.
-// var options = {
-//   key: fs.readFileSync('cert/Private_key_newmame_bcafinance_co_id-2017-2020.key'),
-//   cert: fs.readFileSync('cert/newmame_bcafinance_co_id.crt')
-// };
+This line is from the Node.js HTTPS documentation.
+var options = {
+  key: fs.readFileSync('cert/Private_key_newmame_bcafinance_co_id-2017-2020.key'),
+  cert: fs.readFileSync('cert/newmame_bcafinance_co_id.crt')
+};
 
 
 app.set('port', port);
@@ -30,7 +30,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-// https.createServer(options, app).listen(8443);
+https.createServer(options, app).listen(443);
 
 /**
  * Listen on provided port, on all network interfaces.
