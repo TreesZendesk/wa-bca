@@ -15,6 +15,9 @@ block content
               input#name.form-control(type='text', value=locale, name='locale', hidden)
               input#name.form-control(type='text', value=return_url, name='return_url', hidden)
             div.form-group
+              label(for='sender') Sender:
+              input#name.form-control(type='text', placeholder='KKB or finance', name='sender')
+            div.form-group
               label(for='client_secret') Client Secret:
               input#pw.form-control(type='password' name='client_secret')
             button.btn.btn-primary(type='submit') Submit

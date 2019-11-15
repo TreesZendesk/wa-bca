@@ -57,6 +57,7 @@ router.post('/integration/register', (req, res, next) => {
     metadata['subdomain'] = req.body.subdomain;
     metadata['locale'] = req.body.locale;
     metadata['return_url'] = req.body.return_url;
+    metadata['sender'] = req.body.sender;
 
     let name = "Whatsapp : " + req.body.phone
     addDomain('domain123', req.body.instance_push_id, 'token123', res);
@@ -201,6 +202,10 @@ router.post('/integration/pull', (req, res, next) => {
 
 router.post('/integration/channelback', (req, res, next) => {
     console.log(req.body);
+    logger.info(JSON.stringify(req.body))
+    let metadata = JSON.parse(req.body['metadata'])
+    let to = req.body.thread_id.split("-")[2]
+    logger.info(JSON.stringify(metadata))
     
     // Todo 15 November
     request({
@@ -210,7 +215,7 @@ router.post('/integration/channelback', (req, res, next) => {
         json: {
             "channelID": "102",
             "terminalID": "100",
-            "sender": "KKB",
+            "sender": metadata.sender,
             "customerRefNo": "999999999",
             "review_url": false,
             "recipient_type": "individual",
