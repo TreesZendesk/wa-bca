@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var conn = require('../db/conn');
 const request = require('request');
+const uuid = require('uuid');
 const logger = require('../config/winston')
 
 var jendek_domain_table = 'jendek-domain';
@@ -87,14 +88,14 @@ router.post('/integration/push/from-core', (req, res, next) => {
                 userName = req.body.contacts[j].profile.name
             }
         }
-        var jendekExternalId = 'wa-msg-' + req.body.messages[i].from
+        var jendekExternalId = 'wa-msg-' + req.body.messages[i].id
         var jendekUserExternalId = 'wa-user-' + req.body.messages[i].from
         var jendekThreadExternalId = 'wa-conv-' + req.body.messages[i].from
         msgObj = {
             external_id: jendekExternalId,
             message: req.body.messages[i].text.body,
             thread_id: jendekThreadExternalId,
-            created_at: "2019-09-08T22:48:09Z",
+            created_at: new Date().toISOString(),
             author: {
                 external_id: jendekUserExternalId,
                 name: userName
@@ -148,7 +149,7 @@ router.post('/integration/push', (req, res, next) => {
 
     console.log(JSON.stringify(req.body));
     logger.info(JSON.stringify(req.body));
-    var jendekExternalId = 'wa-msg-' + req.body.to
+    var jendekExternalId = 'wa-msg-' + uuid.v4()
     var jendekUserExternalId = 'wa-user-' + req.body.to
     var jendekThreadExternalId = 'wa-conv-' + req.body.to
     msgObj = {
@@ -204,9 +205,8 @@ router.post('/integration/channelback', (req, res, next) => {
     console.log(req.body);
     logger.info(JSON.stringify(req.body))
     let metadata = JSON.parse(req.body['metadata'])
-    let to = req.body.thread_id.split("-")[2]
-    logger.info(JSON.stringify(metadata))
-    
+    let to = req.body.thread_id.split("-")[2]    
+
     // Todo 15 November
     request({
         url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
@@ -219,7 +219,7 @@ router.post('/integration/channelback', (req, res, next) => {
             "customerRefNo": "999999999",
             "review_url": false,
             "recipient_type": "individual",
-            "to": "6282213728117",
+            "to": to,
             "type": "text",
             "text": {
                 "body": req.body.message

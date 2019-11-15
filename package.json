@@ -20,6 +20,7 @@
     "request": "^2.88.0",
     "sanitize-html": "^1.20.1",
     "sequelize": "^5.19.2",
+    "uuid": "^3.3.3",
     "winston-logzio": "^5.0.3"
   },
   "devDependencies": {
