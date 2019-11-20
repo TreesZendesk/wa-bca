@@ -4,6 +4,7 @@ var conn = require('../db/conn');
 const request = require('request');
 const uuid = require('uuid');
 const logger = require('../config/winston')
+var fs  = require('fs');
 
 var jendek_domain_table = 'jendek-domain';
 
@@ -229,8 +230,14 @@ router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
     var getMediaId = params.mediaid
     var getChannel = params.channel
 
+    logger.info("getMediaId")
+    logger.info(JSON.stringify(getMediaId));
+
+    logger.info("getChannel")
+    logger.info(JSON.stringify(getChannel));
+
     request({
-        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/media/get",
+        url: "http://192.168.29.191:9010/api/wa/v1/media/get",
         method: 'POST',
         json: {
             "channel": getChannel,
@@ -242,7 +249,16 @@ router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
         if (error) {
             res.status(500).send({})
         } else {
+            // fs.createReadStream("./toSomeFile").pipe(res);
             res.status(200).send(newRes.body)
+            // newRes.pipe(res)
+            // var readStream = new stream.PassThrough();
+            // readStream.end(newRes);
+
+            // res.set('Content-disposition', 'attachment; filename=' + fileName);
+            // res.set('Content-Type', 'text/plain');
+
+            // readStream.pipe(res);
         }
     }); 
 })
@@ -300,9 +316,7 @@ router.post('/integration/channelback', (req, res, next) => {
         }, function (error, newRes) {
             console.log(newRes)
             let imageData = newRes.body
-    
-            let imageUploadUrl = ''
-    
+        
             const uploadImageRequest = {
                 method: "POST",
                 url: "http://192.168.29.189:9001/api/wa/v1/media/upload",
@@ -325,7 +339,7 @@ router.post('/integration/channelback', (req, res, next) => {
                     uploadMediaId = body.media[0].id
                 }
                 request({
-                    url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
+                    url: "http://192.168.29.189:9001/api/wa/v1/text/send",
                     method: 'POST',
                     rejectUnauthorized: false,
                     json: {
@@ -339,7 +353,7 @@ router.post('/integration/channelback', (req, res, next) => {
                         "type": "image",
                         "image": {
                             "id": uploadMediaId,
-                            "caption": req.body.message
+                            "caption": req.body.message || ""
                         }
                     }
                 }, function (error, newRes) {
