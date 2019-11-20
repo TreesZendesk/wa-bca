@@ -88,19 +88,43 @@ router.post('/integration/push/from-core', (req, res, next) => {
                 userName = req.body.contacts[j].profile.name
             }
         }
+
+        var msgType = req.body.messages[i].type
         var jendekExternalId = 'wa-msg-' + req.body.messages[i].id
         var jendekUserExternalId = 'wa-user-' + req.body.messages[i].from
         var jendekThreadExternalId = 'wa-conv-' + req.body.messages[i].from
-        msgObj = {
-            external_id: jendekExternalId,
-            message: req.body.messages[i].text.body,
-            thread_id: jendekThreadExternalId,
-            created_at: new Date().toISOString(),
-            author: {
-                external_id: jendekUserExternalId,
-                name: userName
-            },
-            allow_channelback: true
+
+        if (msgType == "text") {
+            msgObj = {
+                external_id: jendekExternalId,
+                message: req.body.messages[i].text.body,
+                thread_id: jendekThreadExternalId,
+                created_at: new Date().toISOString(),
+                author: {
+                    external_id: jendekUserExternalId,
+                    name: userName
+                },
+                allow_channelback: true
+            }
+        } else if (msgType == "image") {
+            var imageChannel = req.body.sender
+            var imageId = req.body.messages[i].images.id
+            var fileUrl = generateFileUrl(imageId, imageChannel)
+
+            msgObj = {
+                external_id: jendekExternalId,
+                message: req.body.messages[i].images.caption || "",
+                thread_id: jendekThreadExternalId,
+                created_at: new Date().toISOString(),
+                author: {
+                    external_id: jendekUserExternalId,
+                    name: userName
+                },
+                file_urls: [
+                    fileUrl
+                ],
+                allow_channelback: true
+            }
         }
         externalRsrc.push(msgObj);
         msgObj = {};
@@ -201,40 +225,165 @@ router.post('/integration/pull', (req, res, next) => {
     res.status(200).send({});
 })
 
+router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
+    var getMediaId = params.mediaid
+    var getChannel = params.channel
+
+    request({
+        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/media/get",
+        method: 'POST',
+        json: {
+            "channel": getChannel,
+            "mediaId": getMediaId
+        }
+    }, function (error, newRes) {
+        console.log(error)
+        console.log(newRes)
+        if (error) {
+            res.status(500).send({})
+        } else {
+            res.status(200).send(newRes.body)
+        }
+    }); 
+})
+
+router.get('/testing-image', (req, res, next) => {
+    request({
+        url: 'https://faskanskk1571648431.zendesk.com/attachments/token/iyselTHQrof21Jx95HlrrNBnM/?name=image-from-ios.jpg',
+        method: 'GET',
+    }, function (error, newRes) {
+        console.log(newRes)
+        let imageData = newRes.body
+
+        let imageUploadUrl = ''
+
+        const uploadImageRequest = {
+            method: "POST",
+            url: "http://192.168.29.189:9001/api/wa/v1/media/upload",
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+            formData : {
+                "image" : imageData,
+                "mediaType": "image",
+                "channelID": "102",
+                "terminalID": "100",
+                "customerRefNo": "99999999999",
+                "sender": "KKB"
+            }
+        };
+        
+        request(uploadImageRequest, function (err, uploadRes, body) {
+            if (err) {
+                console.log(err);
+            }
+            console.log(body);
+            console.log(uploadRes)
+            res.status(200).send(uploadRes)
+        });
+    })
+})
+
 router.post('/integration/channelback', (req, res, next) => {
     console.log(req.body);
     logger.info(JSON.stringify(req.body))
     let metadata = JSON.parse(req.body['metadata'])
-    let to = req.body.thread_id.split("-")[2]    
+    let to = req.body.thread_id.split("-")[2]
+    
+    let fileUrlArray = req.body.file_urls
 
-    // Todo 15 November
-    request({
-        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
-        method: 'POST',
-        rejectUnauthorized: false,
-        json: {
-            "channelID": "102",
-            "terminalID": "100",
-            "sender": metadata.sender,
-            "customerRefNo": "999999999",
-            "review_url": false,
-            "recipient_type": "individual",
-            "to": to,
-            "type": "text",
-            "text": {
-                "body": req.body.message
-            }
-        }
-    }, function (error, newRes) {
-        console.log(newRes.body);
-        if (newRes.body.statusDesc == "SUCCESS") {
-            res.status(200).send(newRes.body);
-        } else {
-            res.status(500).send({
-                error: "error",
+    if (fileUrlArray.length > 0) {
+        var uploadMediaId = ''
+        request({
+            url: 'https://faskanskk1571648431.zendesk.com/attachments/token/iyselTHQrof21Jx95HlrrNBnM/?name=image-from-ios.jpg',
+            method: 'GET',
+        }, function (error, newRes) {
+            console.log(newRes)
+            let imageData = newRes.body
+    
+            let imageUploadUrl = ''
+    
+            const uploadImageRequest = {
+                method: "POST",
+                url: "http://192.168.29.189:9001/api/wa/v1/media/upload",
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                },
+                formData : {
+                    "file" : imageData,
+                    "mediaType": "image",
+                    "channelID": "102",
+                    "terminalID": "100",
+                    "customerRefNo": "99999999999",
+                    "sender": "KKB"
+                }
+            };
+            request(uploadImageRequest, function (err, res, body) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    uploadMediaId = body.media[0].id
+                }
+                request({
+                    url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
+                    method: 'POST',
+                    rejectUnauthorized: false,
+                    json: {
+                        "channelID": "102",
+                        "terminalID": "100",
+                        "sender": metadata.sender,
+                        "customerRefNo": "999999999",
+                        "review_url": false,
+                        "recipient_type": "individual",
+                        "to": to,
+                        "type": "image",
+                        "image": {
+                            "id": uploadMediaId,
+                            "caption": req.body.message
+                        }
+                    }
+                }, function (error, newRes) {
+                    console.log(newRes.body);
+                    if (newRes.body.statusDesc == "SUCCESS") {
+                        res.status(200).send(newRes.body);
+                    } else {
+                        res.status(500).send({
+                            error: "error",
+                        });
+                    }
+                });  
             });
-        }
-    });    
+        })
+    } else {
+        // Todo 15 November
+        request({
+            url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
+            method: 'POST',
+            rejectUnauthorized: false,
+            json: {
+                "channelID": "102",
+                "terminalID": "100",
+                "sender": metadata.sender,
+                "customerRefNo": "999999999",
+                "review_url": false,
+                "recipient_type": "individual",
+                "to": to,
+                "type": "text",
+                "text": {
+                    "body": req.body.message
+                }
+            }
+        }, function (error, newRes) {
+            console.log(newRes.body);
+            if (newRes.body.statusDesc == "SUCCESS") {
+                res.status(200).send(newRes.body);
+            } else {
+                res.status(500).send({
+                    error: "error",
+                });
+            }
+        });   
+    }
 })
 
 router.post('/integration/clickthrough', (req, res, next) => {
@@ -251,6 +400,11 @@ router.get('/get_domain', (req, res, next) => {
 router.get('/add_domain', (req, res, next) => {
     addDomain('domain123', 'push123', 'token123', res);
 })
+
+function generateFileUrl (mediaId, channel) {
+    let host = req.hostname
+    return "https://" + host + "/jendek/getmedia/" + mediaId + "/" + channel
+}
 
 function getDomain (res) {
     let dbResponse = {};
