@@ -236,8 +236,19 @@ router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
     logger.info("getChannel")
     logger.info(JSON.stringify(getChannel));
 
+    // fs.readFile('response.bin', (err, data) => {
+    //     if (err) throw err;
+    //     const buf = Buffer.from(data);
+    //     res.writeHead(200, {
+    //         'Content-Type': 'image/jpeg',
+    //         'Content-disposition': 'attachment; filename=data.jpeg'
+    //     });
+    //     res.write(buf);
+    //     res.end();
+    // });
+
     request({
-        url: "http://192.168.29.191:9010/api/wa/v1/media/get",
+        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxygetimage/api/wa/v1/media/get",
         method: 'POST',
         json: {
             "channel": getChannel,
@@ -249,20 +260,18 @@ router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
         if (error) {
             res.status(500).send({})
         } else {
-            // fs.createReadStream("./toSomeFile").pipe(res);
-            res.status(200).send(newRes.body)
-            // newRes.pipe(res)
-            // var readStream = new stream.PassThrough();
-            // readStream.end(newRes);
-
-            // res.set('Content-disposition', 'attachment; filename=' + fileName);
-            // res.set('Content-Type', 'text/plain');
-
-            // readStream.pipe(res);
+            const buf = Buffer.from(newRes);
+            res.writeHead(200, {
+                'Content-Type': 'image/jpeg',
+                'Content-disposition': 'attachment; filename=data.jpeg'
+            });
+            res.write(buf);
+            res.end();
         }
-    }); 
+    }).pipe(res);
 })
 
+// IGNORE - only for testing
 router.get('/testing-image', (req, res, next) => {
     request({
         url: 'https://faskanskk1571648431.zendesk.com/attachments/token/iyselTHQrof21Jx95HlrrNBnM/?name=image-from-ios.jpg',
@@ -311,7 +320,7 @@ router.post('/integration/channelback', (req, res, next) => {
     if (fileUrlArray.length > 0) {
         var uploadMediaId = ''
         request({
-            url: 'https://faskanskk1571648431.zendesk.com/attachments/token/iyselTHQrof21Jx95HlrrNBnM/?name=image-from-ios.jpg',
+            url: fileUrlArrayFqleurlarray[0],
             method: 'GET',
         }, function (error, newRes) {
             console.log(newRes)
