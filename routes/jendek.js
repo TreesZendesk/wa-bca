@@ -110,7 +110,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
         } else if (msgType == "image") {
             var imageChannel = req.body.sender
             var imageId = req.body.messages[i].image.id
-            var fileUrl = generateFileUrl(imageId, imageChannel)
+            var fileUrl = generateFileUrl(req, imageId, imageChannel)
 
             msgObj = {
                 external_id: jendekExternalId,
@@ -424,7 +424,7 @@ router.get('/add_domain', (req, res, next) => {
     addDomain('domain123', 'push123', 'token123', res);
 })
 
-function generateFileUrl (mediaId, channel) {
+function generateFileUrl (req, mediaId, channel) {
     let host = req.hostname
     return "https://" + host + "/jendek/getmedia/" + mediaId + "/" + channel
 }
