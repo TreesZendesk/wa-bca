@@ -109,12 +109,12 @@ router.post('/integration/push/from-core', (req, res, next) => {
             }
         } else if (msgType == "image") {
             var imageChannel = req.body.sender
-            var imageId = req.body.messages[i].images.id
+            var imageId = req.body.messages[i].image.id
             var fileUrl = generateFileUrl(imageId, imageChannel)
 
             msgObj = {
                 external_id: jendekExternalId,
-                message: req.body.messages[i].images.caption || "",
+                message: req.body.messages[i].image.caption || "",
                 thread_id: jendekThreadExternalId,
                 created_at: new Date().toISOString(),
                 author: {
