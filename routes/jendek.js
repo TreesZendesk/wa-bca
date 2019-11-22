@@ -78,10 +78,12 @@ router.post('/integration/push/from-core', (req, res, next) => {
     let externalRsrcs = {};
     let instance_push_id = req.body.push_id;
     let token_push = req.body.token;
+
     let msgObj = {};
 
     console.log(JSON.stringify(req.body));
     logger.info(JSON.stringify(req.body));
+    console.log(req.body.messages)
     for (var i=0; i<req.body.messages.length; i++) {
         let userName = ""
         for (var j=0; j<req.body.contacts.length; j++) {
