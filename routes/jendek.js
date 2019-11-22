@@ -110,7 +110,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
                 allow_channelback: true
             }
         } else if (msgType == "image") {
-            var imageChannel = req.body.sender
+            var imageChannel = req.body.channel
             var imageId = req.body.messages[i].image.id
             var fileUrl = generateFileUrl(req, imageId, imageChannel)
 
