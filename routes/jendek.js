@@ -248,7 +248,7 @@ router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
     // });
 
     request({
-        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxygetimage/api/wa/v1/media/get",
+        url: "http://192.168.29.191:9010/api/wa/v1/media/get",
         method: 'POST',
         json: {
             "channel": getChannel,
@@ -380,7 +380,7 @@ router.post('/integration/channelback', (req, res, next) => {
     } else {
         // Todo 15 November
         request({
-            url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
+            url: "http://192.168.29.189:9001/api/wa/v1/text/send",
             method: 'POST',
             rejectUnauthorized: false,
             json: {
