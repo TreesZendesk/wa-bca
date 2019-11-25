@@ -364,6 +364,8 @@ router.post('/integration/channelback', (req, res, next) => {
     console.log(req.body);
     logger.info(JSON.stringify(req.body))
     let metadata = JSON.parse(req.body['metadata'])
+    // let push_id = metadata.instance_push_id
+    // let token_id = metadata.token_id
     let to = req.body.thread_id.split("-")[2]
     
     request({
@@ -385,8 +387,8 @@ router.post('/integration/channelback', (req, res, next) => {
         }
     }, function (error, newRes) {
         console.log(newRes.body);
-        if (newRes.body.statusDesc == "SUCCESS") {
-            res.status(200).send(newRes.body);
+        if (newRes.body.statusCode == "00") {
+            res.status(200).send({...newRes.body, external_id: newRes.body.transactionRefNo});
         } else {
             res.status(500).send({
                 error: "error",
