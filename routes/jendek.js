@@ -298,7 +298,8 @@ router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
     // });
 
     request({
-        url: "http://192.168.29.191:9010/api/wa/v1/media/get",
+        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/media/get",
+        rejectUnauthorized: false,
         method: 'POST',
         json: {
             "channel": getChannel,
@@ -365,98 +366,33 @@ router.post('/integration/channelback', (req, res, next) => {
     let metadata = JSON.parse(req.body['metadata'])
     let to = req.body.thread_id.split("-")[2]
     
-    let fileUrlArray = req.body.file_urls
-
-    if (fileUrlArray.length > 0) {
-        var uploadMediaId = ''
-        request({
-            url: fileUrlArrayFqleurlarray[0],
-            method: 'GET',
-        }, function (error, newRes) {
-            console.log(newRes)
-            let imageData = newRes.body
-        
-            const uploadImageRequest = {
-                method: "POST",
-                url: "http://192.168.29.189:9001/api/wa/v1/media/upload",
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                },
-                formData : {
-                    "file" : imageData,
-                    "mediaType": "image",
-                    "channelID": "102",
-                    "terminalID": "100",
-                    "customerRefNo": "99999999999",
-                    "sender": "KKB"
-                }
-            };
-            request(uploadImageRequest, function (err, res, body) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    uploadMediaId = body.media[0].id
-                }
-                request({
-                    url: "http://192.168.29.189:9001/api/wa/v1/text/send",
-                    method: 'POST',
-                    rejectUnauthorized: false,
-                    json: {
-                        "channelID": "102",
-                        "terminalID": "100",
-                        "sender": metadata.sender,
-                        "customerRefNo": "999999999",
-                        "review_url": false,
-                        "recipient_type": "individual",
-                        "to": to,
-                        "type": "image",
-                        "image": {
-                            "id": uploadMediaId,
-                            "caption": req.body.message || ""
-                        }
-                    }
-                }, function (error, newRes) {
-                    console.log(newRes.body);
-                    if (newRes.body.statusDesc == "SUCCESS") {
-                        res.status(200).send(newRes.body);
-                    } else {
-                        res.status(500).send({
-                            error: "error",
-                        });
-                    }
-                });  
+    request({
+        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
+        method: 'POST',
+        rejectUnauthorized: false,
+        json: {
+            "channelID": "102",
+            "terminalID": "100",
+            "sender": metadata.sender,
+            "customerRefNo": "999999999",
+            "review_url": false,
+            "recipient_type": "individual",
+            "to": to,
+            "type": "text",
+            "text": {
+                "body": req.body.message
+            }
+        }
+    }, function (error, newRes) {
+        console.log(newRes.body);
+        if (newRes.body.statusDesc == "SUCCESS") {
+            res.status(200).send(newRes.body);
+        } else {
+            res.status(500).send({
+                error: "error",
             });
-        })
-    } else {
-        // Todo 15 November
-        request({
-            url: "http://192.168.29.189:9001/api/wa/v1/text/send",
-            method: 'POST',
-            rejectUnauthorized: false,
-            json: {
-                "channelID": "102",
-                "terminalID": "100",
-                "sender": metadata.sender,
-                "customerRefNo": "999999999",
-                "review_url": false,
-                "recipient_type": "individual",
-                "to": to,
-                "type": "text",
-                "text": {
-                    "body": req.body.message
-                }
-            }
-        }, function (error, newRes) {
-            console.log(newRes.body);
-            if (newRes.body.statusDesc == "SUCCESS") {
-                res.status(200).send(newRes.body);
-            } else {
-                res.status(500).send({
-                    error: "error",
-                });
-            }
-        });   
-    }
+        }
+    });    
 })
 
 router.post('/integration/clickthrough', (req, res, next) => {
