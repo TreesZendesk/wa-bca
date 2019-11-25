@@ -298,7 +298,7 @@ router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
     // });
 
     request({
-        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/media/get",
+        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxygetimage/api/wa/v1/media/get",
         rejectUnauthorized: false,
         method: 'POST',
         json: {
