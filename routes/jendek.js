@@ -14,7 +14,7 @@ router.get('/manifest', (req, res, next) => {
 
     res.status(200).send({
         name: "WhatsApp-bca",
-        id: "new-bca-zendesk-wa",
+        id: "new-bca-zendesk-wa.uniquebcaf",
         author: "Trees Solutions",
         version: "v1.0.0",
         push_client_id: "zd_trees_integration",
