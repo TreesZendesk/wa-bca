@@ -116,7 +116,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
 
             msgObj = {
                 external_id: jendekExternalId,
-                message: req.body.messages[i].image.caption || "",
+                message: req.body.messages[i].image.caption || "-image from user-",
                 thread_id: jendekThreadExternalId,
                 created_at: new Date().toISOString(),
                 author: {
