@@ -9,8 +9,8 @@ var fs  = require('fs');
 var jendek_domain_table = 'jendek-domain';
 
 router.get('/manifest', (req, res, next) => {
-    let host = req.hostname
-    // let host = "8390f049.ngrok.io"
+    // let host = req.hostname
+    let host = "expo.bcaf.id/zConnector"
 
     res.status(200).send({
         name: "WhatsApp-bca",
