@@ -160,7 +160,8 @@ router.post('/integration/push/from-core', (req, res, next) => {
             });
         } else {
             res.status(500).send({
-                error: "error"
+                error: "error",
+                reason: err
             });
         }
     });
