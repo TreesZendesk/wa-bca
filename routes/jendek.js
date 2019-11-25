@@ -157,6 +157,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
+                response: newRes["status"]
             });
         } else {
             res.status(500).send({
@@ -216,6 +217,7 @@ router.post('/integration/push', (req, res, next) => {
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
+                response: newRes["status"]
             });
         } else {
             res.status(500).send({
@@ -227,6 +229,51 @@ router.post('/integration/push', (req, res, next) => {
 
 router.post('/integration/pull', (req, res, next) => {
     res.status(200).send({});
+})
+
+router.post('/getmedia/:mediaid/:channel', async ({params}, res) => {
+    var getMediaId = params.mediaid
+    var getChannel = params.channel
+
+    logger.info("getMediaId")
+    logger.info(JSON.stringify(getMediaId));
+
+    logger.info("getChannel")
+    logger.info(JSON.stringify(getChannel));
+
+    // fs.readFile('response.bin', (err, data) => {
+    //     if (err) throw err;
+    //     const buf = Buffer.from(data);
+    //     res.writeHead(200, {
+    //         'Content-Type': 'image/jpeg',
+    //         'Content-disposition': 'attachment; filename=data.jpeg'
+    //     });
+    //     res.write(buf);
+    //     res.end();
+    // });
+
+    request({
+        url: "http://192.168.29.191:9010/api/wa/v1/media/get",
+        method: 'POST',
+        json: {
+            "channel": getChannel,
+            "mediaId": getMediaId
+        }
+    }, function (error, newRes) {
+        console.log(error)
+        console.log(newRes)
+        if (error) {
+            res.status(500).send({})
+        } else {
+            const buf = Buffer.from(newRes);
+            res.writeHead(200, {
+                'Content-Type': 'image/jpeg',
+                'Content-disposition': 'attachment; filename=data.jpeg'
+            });
+            res.write(buf);
+            res.end();
+        }
+    }).pipe(res);
 })
 
 router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
