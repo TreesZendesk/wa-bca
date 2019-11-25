@@ -370,7 +370,7 @@ router.post('/integration/channelback', (req, res, next) => {
     if (fileUrlArray.length > 0) {
         var uploadMediaId = ''
         request({
-            url: fileUrlArrayFqleurlarray[0],
+            url: fileUrlArray[0],
             method: 'GET',
         }, function (error, newRes) {
             console.log(newRes)
