@@ -491,8 +491,4 @@ function addDomain (jendekDomainName, jendekDomainPushId, jendekDomainToken, res
     conn.end();
 }
 
-function getImage (res) {
-    
-}
-
 module.exports = router;
