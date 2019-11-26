@@ -79,6 +79,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
     let externalRsrcs = {};
     let instance_push_id = req.body.push_id;
     let token_push = req.body.token;
+    let sender = req.body.channel
 
     let msgObj = {};
 
@@ -94,9 +95,9 @@ router.post('/integration/push/from-core', (req, res, next) => {
         }
 
         var msgType = req.body.messages[i].type
-        var jendekExternalId = 'wa-msg-' + req.body.messages[i].id
-        var jendekUserExternalId = 'wa-user-' + req.body.messages[i].from
-        var jendekThreadExternalId = 'wa-conv-' + req.body.messages[i].from
+        var jendekExternalId = 'wa-msg-' + req.body.messages[i].id + "-" + sender
+        var jendekUserExternalId = 'wa-user-' + req.body.messages[i].from + "-" + sender
+        var jendekThreadExternalId = 'wa-conv-' + req.body.messages[i].from + "-" + sender
 
         if (msgType == "text") {
             msgObj = {
@@ -175,13 +176,14 @@ router.post('/integration/push', (req, res, next) => {
     let instance_push_id = req.body.push_id;
     let token_push = req.body.token;
     let created_at = req.body.created_at;
+    let sender = req.body.sender
     let msgObj = {};
 
     console.log(JSON.stringify(req.body));
     logger.info(JSON.stringify(req.body));
-    var jendekExternalId = 'wa-msg-' + uuid.v4()
-    var jendekUserExternalId = 'wa-user-' + req.body.to
-    var jendekThreadExternalId = 'wa-conv-' + req.body.to
+    var jendekExternalId = 'wa-msg-' + uuid.v4() + '-' + sender
+    var jendekUserExternalId = 'wa-user-' + req.body.to + '-' + sender
+    var jendekThreadExternalId = 'wa-conv-' + req.body.to + '-' + sender
     msgObj = {
         external_id: jendekExternalId,
         message: req.body.text.body,
