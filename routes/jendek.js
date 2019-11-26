@@ -421,8 +421,9 @@ router.get('/add_domain', (req, res, next) => {
 })
 
 function generateFileUrl (req, mediaId, channel) {
-    let host = req.hostname
-    return "https://" + host + "/zConnector/jendek/getmedia/" + mediaId + "/" + channel
+    // let host = req.hostname
+    let imgServer = "expo.bcaf.id"
+    return "https://" + imgServer + "/zConnector/jendek/getmedia/" + mediaId + "/" + channel
 }
 
 function getDomain (res) {
