@@ -231,7 +231,7 @@ router.post('/integration/pull', (req, res, next) => {
     res.status(200).send({});
 })
 
-router.post('/getmedia/:mediaid/:channel', async ({params}, res) => {
+router.post('/getmedia/:mediaid/:channel/:filename\.:ext?', async ({params}, res) => {
     var getMediaId = params.mediaid
     var getChannel = params.channel
 
@@ -280,7 +280,7 @@ router.post('/getmedia/:mediaid/:channel', async ({params}, res) => {
     }).pipe(res);
 })
 
-router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
+router.get('/getmedia/:mediaid/:channel/:filename\.:ext?', async ({params}, res) => {
     var getMediaId = params.mediaid
     var getChannel = params.channel
 
@@ -423,7 +423,7 @@ router.get('/add_domain', (req, res, next) => {
 function generateFileUrl (req, mediaId, channel) {
     // let host = req.hostname
     let imgServer = "expo.bcaf.id"
-    return "https://" + imgServer + "/zConnector/jendek/getmedia/" + mediaId + "/" + channel
+    return "https://" + imgServer + "/zConnector/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpg"
 }
 
 function getDomain (res) {
