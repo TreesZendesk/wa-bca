@@ -253,9 +253,9 @@ const getMedia = async ({ params }, res) => {
             "accept": "image/jpeg"
         },
     }, function (error, newRes) {
-        console.log(error);
+        // console.log(error);
         // console.log(newRes.body);
-        if (error) {
+        if (error || newRes.body.status == "500") {
             res.status(500).send({});
         }
         else {
