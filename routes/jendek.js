@@ -366,7 +366,7 @@ router.post('/integration/channelback', async (req, res, next) => {
                 channelID: 102,
                 terminalID: 100,
                 customerRefNo: "999999999",
-                sender: "KKB"
+                sender: metadata.sender
             }
             var uploadMedia = {
                 method: 'POST',
