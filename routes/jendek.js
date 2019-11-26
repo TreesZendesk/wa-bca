@@ -258,7 +258,11 @@ router.post('/getmedia/:mediaid/:channel', async ({params}, res) => {
         json: {
             "channel": getChannel,
             "mediaId": getMediaId
-        }
+        },
+        headers: {
+            "Content-Type": "application/json",
+            "accept": "image/jpeg"
+        },
     }, function (error, newRes) {
         console.log(error)
         console.log(newRes)
@@ -304,7 +308,11 @@ router.get('/getmedia/:mediaid/:channel', async ({params}, res) => {
         json: {
             "channel": getChannel,
             "mediaId": getMediaId
-        }
+        },
+        headers: {
+            "Content-Type": "application/json",
+            "accept": "image/jpeg"
+        },
     }, function (error, newRes) {
         console.log(error)
         console.log(newRes)
