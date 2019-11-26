@@ -315,104 +315,86 @@ router.post('/integration/channelback', (req, res, next) => {
     console.log(req.body);
     logger.info(JSON.stringify(req.body))
     let metadata = JSON.parse(req.body['metadata'])
+
+    // console.log(fs.createReadStream('http://localhost:3000/proxy/mock.jpeg.png'))
     // let push_id = metadata.instance_push_id
     // let token_id = metadata.token_id
     let to = req.body.thread_id.split("-")[2]
 
-    let fileUrl = "https://conrokitvhelp1572418560.zendesk.com/attachments/token/XNgbQws6Ot8H7L1Y4PXhNniIl/?name=Screen_Shot_2019-11-13_at_5.28.17_PM.png"
-
-    request({
-        url: fileUrl,
-        method: 'GET',
-    }, function (error, getImage) {
-        console.log("getting image")
-        let imageData = getImage.body
-        const uploadImageRequest = {
-            method: "POST",
-            url: "http://192.168.29.189:9001/api/wa/v1/media/upload",
-            headers: {
-                "Content-Type": "multipart/form-data"
-            },
-            formData : {
-                "file" : imageData,
-                "mediaType": "image",
+    if (!req.body["file_urls[]"]) {
+        request({
+            url: "http://192.168.29.189:9001/api/wa/v1/text/send",
+            method: 'POST',
+            json: {
                 "channelID": "102",
                 "terminalID": "100",
-                "customerRefNo": "99999999999",
-                "sender": "KKB"
+                "sender": metadata.sender,
+                "customerRefNo": "999999999",
+                "recipient_type": "individual",
+                "to": to,
+                "type": "text",
+                "text": {
+                    "body": req.body.message
+                }
             }
-        };
-        request(uploadImageRequest, function (err, uploadRes, body) {
-            console.log("uploading data")
-            console.log(uploadRes)
-            console.log(err)
-            console.log(body)
-            // if (err) {
-            //     console.log(err);
-            // } else {
-            //     // uploadMediaId = body.media[0].id
-            // }
-            // request({
-            //     url: "http://192.168.29.189:9001/api/wa/v1/text/send",
-            //     method: 'POST',
-            //     rejectUnauthorized: false,
-            //     json: {
-            //         "channelID": "102",
-            //         "terminalID": "100",
-            //         "sender": metadata.sender,
-            //         "customerRefNo": "999999999",
-            //         "review_url": false,
-            //         "recipient_type": "individual",
-            //         "to": to,
-            //         "type": "image",
-            //         "image": {
-            //             "id": uploadMediaId,
-            //             "caption": req.body.message || ""
-            //         }
-            //     }
-            // }, function (error, newRes) {
-            //     console.log(newRes.body);
-            //     if (newRes.body.statusDesc == "SUCCESS") {
-            //         res.status(200).send(newRes.body);
-            //     } else {
-            //         res.status(500).send({
-            //             error: "error",
-            //         });
-            //     }
-            // });  
+        }, function (error, chatRes) {
+            if (chatRes.body.statusCode == "00") {
+                res.status(200).send({...chatRes.body, external_id: chatRes.body.transactionRefNo});
+            } else {
+                res.status(500).send({
+                    error: "error",
+                });
+            }
         });
-    })
+    } else {
+        let fileUrl = req.body["file_urls[]"] instanceof Array ? req.body["file_urls[]"][0] : req.body["file_urls[]"]
+        console.log(fileUrl)
+        var formData = {
+            mediaType: "image",
+            file: request(fileUrl),
+            channelID: 102,
+            terminalID: 100,
+            customerRefNo: "999999999",
+            sender: "KKB"
+        }
+        request.post({url: 'http://192.168.29.189:9001/api/wa/v1/media/upload', formData}, (err, httpResponse, body) => {
+            if (err) {
+                return console.error('upload failed:', err);
+            }
+            console.log('Upload successful!  Server responded with:', body);
+            let newBody = JSON.parse(body)
 
-    
-    
-    
-    // request({
-    //     url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
-    //     method: 'POST',
-    //     rejectUnauthorized: false,
-    //     json: {
-    //         "channelID": "102",
-    //         "terminalID": "100",
-    //         "sender": metadata.sender,
-    //         "customerRefNo": "999999999",
-    //         "review_url": false,
-    //         "recipient_type": "individual",
-    //         "to": to,
-    //         "type": "text",
-    //         "text": {
-    //             "body": req.body.message
-    //         }
-    //     }
-    // }, function (error, newRes) {
-    //     console.log(newRes.body);
-    //     if (newRes.body.statusCode == "00") {
-    //         res.status(200).send({...newRes.body, external_id: newRes.body.transactionRefNo});
-    //     } else {
-    //         res.status(500).send({
-    //             error: "error",
-    //         });
-    //     }
-    // });    
+            if (newBody.statusCode == "00") {
+                let mediaId = newBody.media[0].id
+                // console.log(mediaId)
+                request({
+                    url: "http://192.168.29.189:9001/api/wa/v1/media/send",
+                    method: 'POST',
+                    json: {
+                        "channelID": "102",
+                        "terminalID": "100",
+                        "sender": metadata.sender,
+                        "customerRefNo": "999999999",
+                        "recipient_type": "individual",
+                        "to": to,
+                        "type": "image",
+                        "image": {
+                            "id": mediaId,
+                            "caption": req.body.message
+                        }
+                    }
+                }, function (error, chatRes) {
+                    if (chatRes.body.statusCode == "00") {
+                        res.status(200).send({...chatRes.body, external_id: chatRes.body.transactionRefNo});
+                    } else {
+                        res.status(500).send({
+                            error: "error",
+                        });
+                    }
+                });
+            }
+        });
+    }
 })
 
 router.post('/integration/clickthrough', (req, res, next) => {

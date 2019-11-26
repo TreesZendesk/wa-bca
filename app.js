@@ -27,6 +27,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/jendek', jendekRouter);
 app.use('/proxy', proxyRouter);
+app.use('/mock', express.static(path.join(__dirname, 'public')))
 app.use('/wacoreproxy', proxy('192.168.29.189:9001')); 
 app.use('/wacoreproxygetimage', proxy('192.168.29.191:9010')); 
 app.use('/cifherokuproxy/:appname', proxy(req => req.params["appname"] + ".herokuapp.com", {https: true}))
