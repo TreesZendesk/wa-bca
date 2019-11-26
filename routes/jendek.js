@@ -5,6 +5,7 @@ const request = require('request');
 const uuid = require('uuid');
 const logger = require('../config/winston')
 var fs  = require('fs');
+var requestPromise = require('request-promise');
 
 var jendek_domain_table = 'jendek-domain';
 
@@ -311,7 +312,7 @@ router.get('/testing-image', (req, res, next) => {
     })
 })
 
-router.post('/integration/channelback', (req, res, next) => {
+router.post('/integration/channelback', async (req, res, next) => {
     console.log(req.body);
     logger.info(JSON.stringify(req.body))
     let metadata = JSON.parse(req.body['metadata'])
@@ -347,27 +348,46 @@ router.post('/integration/channelback', (req, res, next) => {
             }
         });
     } else {
-        let fileUrl = req.body["file_urls[]"] instanceof Array ? req.body["file_urls[]"][0] : req.body["file_urls[]"]
-        console.log(fileUrl)
-        var formData = {
-            mediaType: "image",
-            file: request(fileUrl),
-            channelID: 102,
-            terminalID: 100,
-            customerRefNo: "999999999",
-            sender: "KKB"
-        }
-        request.post({url: 'http://192.168.29.189:9001/api/wa/v1/media/upload', formData}, (err, httpResponse, body) => {
-            if (err) {
-                return console.error('upload failed:', err);
-            }
-            console.log('Upload successful!  Server responded with:', body);
-            let newBody = JSON.parse(body)
+        // let fileUrl = req.body["file_urls[]"] instanceof Array ? req.body["file_urls[]"][0] : req.body["file_urls[]"]
+        let fileUrl = ''
+        let fileUrls = req.body["file_urls[]"]
+        let urls = fileUrls instanceof Array ? fileUrls : [fileUrls]
+        console.log(urls) 
 
-            if (newBody.statusCode == "00") {
-                let mediaId = newBody.media[0].id
-                // console.log(mediaId)
-                request({
+        for (var i=0; i<urls.length; i++) {
+            let newFileUrl = urls[i]
+            console.log("========")
+            console.log(newFileUrl)
+            var formData = {
+                mediaType: "image",
+                file: request(newFileUrl),
+                channelID: 102,
+                terminalID: 100,
+                customerRefNo: "999999999",
+                sender: "KKB"
+            }
+            var uploadMedia = {
+                method: 'POST',
+                uri: 'http://192.168.29.189:9001/api/wa/v1/media/upload',
+                formData: formData,
+            };
+
+            let uploadRes = await requestPromise(uploadMedia)
+            // console.log(uploadResponse)
+            let uploadResponse = JSON.parse(uploadRes)
+
+            if (uploadResponse.statusCode == "00") {
+                let uploadId = uploadResponse.media[0].id
+                
+                console.log(uploadId)
+
+                let imgCaption = ''
+                if ((i+1) == urls.length) {
+                    imgCaption = req.body.message
+                } else {
+                    imgCaption = ''
+                }
+                var sendMessage = {
                     url: "http://192.168.29.189:9001/api/wa/v1/media/send",
                     method: 'POST',
                     json: {
@@ -379,21 +399,24 @@ router.post('/integration/channelback', (req, res, next) => {
                         "to": to,
                         "type": "image",
                         "image": {
-                            "id": mediaId,
-                            "caption": req.body.message
+                            "id": uploadId,
+                            "caption": imgCaption
                         }
                     }
-                }, function (error, chatRes) {
-                    if (chatRes.body.statusCode == "00") {
-                        res.status(200).send({...chatRes.body, external_id: chatRes.body.transactionRefNo});
+                }
+
+                let chatResponse = await requestPromise(sendMessage)
+                if ((i+1) == urls.length) {
+                    if (chatResponse.statusCode == "00") {
+                        res.status(200).send({...chatResponse, external_id: chatResponse.transactionRefNo});
                     } else {
                         res.status(500).send({
                             error: "error",
                         });
                     }
-                });
+                }
             }
-        });
+        }
     }
 })
 
