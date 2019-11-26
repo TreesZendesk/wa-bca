@@ -318,34 +318,101 @@ router.post('/integration/channelback', (req, res, next) => {
     // let push_id = metadata.instance_push_id
     // let token_id = metadata.token_id
     let to = req.body.thread_id.split("-")[2]
-    
+
+    let fileUrl = "https://conrokitvhelp1572418560.zendesk.com/attachments/token/XNgbQws6Ot8H7L1Y4PXhNniIl/?name=Screen_Shot_2019-11-13_at_5.28.17_PM.png"
+
     request({
-        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
-        method: 'POST',
-        rejectUnauthorized: false,
-        json: {
-            "channelID": "102",
-            "terminalID": "100",
-            "sender": metadata.sender,
-            "customerRefNo": "999999999",
-            "review_url": false,
-            "recipient_type": "individual",
-            "to": to,
-            "type": "text",
-            "text": {
-                "body": req.body.message
+        url: fileUrl,
+        method: 'GET',
+    }, function (error, getImage) {
+        console.log("getting image")
+        let imageData = getImage.body
+        const uploadImageRequest = {
+            method: "POST",
+            url: "http://192.168.29.189:9001/api/wa/v1/media/upload",
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+            formData : {
+                "file" : imageData,
+                "mediaType": "image",
+                "channelID": "102",
+                "terminalID": "100",
+                "customerRefNo": "99999999999",
+                "sender": "KKB"
             }
-        }
-    }, function (error, newRes) {
-        console.log(newRes.body);
-        if (newRes.body.statusCode == "00") {
-            res.status(200).send({...newRes.body, external_id: newRes.body.transactionRefNo});
-        } else {
-            res.status(500).send({
-                error: "error",
-            });
-        }
-    });    
+        };
+        request(uploadImageRequest, function (err, uploadRes, body) {
+            console.log("uploading data")
+            console.log(uploadRes)
+            console.log(err)
+            console.log(body)
+            // if (err) {
+            //     console.log(err);
+            // } else {
+            //     // uploadMediaId = body.media[0].id
+            // }
+            // request({
+            //     url: "http://192.168.29.189:9001/api/wa/v1/text/send",
+            //     method: 'POST',
+            //     rejectUnauthorized: false,
+            //     json: {
+            //         "channelID": "102",
+            //         "terminalID": "100",
+            //         "sender": metadata.sender,
+            //         "customerRefNo": "999999999",
+            //         "review_url": false,
+            //         "recipient_type": "individual",
+            //         "to": to,
+            //         "type": "image",
+            //         "image": {
+            //             "id": uploadMediaId,
+            //             "caption": req.body.message || ""
+            //         }
+            //     }
+            // }, function (error, newRes) {
+            //     console.log(newRes.body);
+            //     if (newRes.body.statusDesc == "SUCCESS") {
+            //         res.status(200).send(newRes.body);
+            //     } else {
+            //         res.status(500).send({
+            //             error: "error",
+            //         });
+            //     }
+            // });  
+        });
+    })
+
+    
+    
+    
+    // request({
+    //     url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxy/api/wa/v1/text/send",
+    //     method: 'POST',
+    //     rejectUnauthorized: false,
+    //     json: {
+    //         "channelID": "102",
+    //         "terminalID": "100",
+    //         "sender": metadata.sender,
+    //         "customerRefNo": "999999999",
+    //         "review_url": false,
+    //         "recipient_type": "individual",
+    //         "to": to,
+    //         "type": "text",
+    //         "text": {
+    //             "body": req.body.message
+    //         }
+    //     }
+    // }, function (error, newRes) {
+    //     console.log(newRes.body);
+    //     if (newRes.body.statusCode == "00") {
+    //         res.status(200).send({...newRes.body, external_id: newRes.body.transactionRefNo});
+    //     } else {
+    //         res.status(500).send({
+    //             error: "error",
+    //         });
+    //     }
+    // });    
 })
 
 router.post('/integration/clickthrough', (req, res, next) => {

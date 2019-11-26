@@ -9,7 +9,7 @@ var proxyNew = require('http-proxy-middleware');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var jendekRouter = require('./routes/jendek');
-var proxyRouter = require('./routes/jendek');
+var proxyRouter = require('./routes/proxy');
 
 var app = express();
 
@@ -26,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/jendek', jendekRouter);
+app.use('/proxy', proxyRouter);
 app.use('/wacoreproxy', proxy('192.168.29.189:9001')); 
 app.use('/wacoreproxygetimage', proxy('192.168.29.191:9010')); 
 app.use('/cifherokuproxy/:appname', proxy(req => req.params["appname"] + ".herokuapp.com", {https: true}))
