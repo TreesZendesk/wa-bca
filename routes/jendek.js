@@ -231,75 +231,14 @@ router.post('/integration/pull', (req, res, next) => {
     res.status(200).send({});
 })
 
-router.post('/getmedia/:mediaid/:channel/:filename\.:ext?', async ({params}, res) => {
-    var getMediaId = params.mediaid
-    var getChannel = params.channel
-
-    logger.info("getMediaId")
+const getMedia = async ({ params }, res) => {
+    var getMediaId = params.mediaid;
+    var getChannel = params.channel;
+    
+    logger.info("getMediaId");
     logger.info(JSON.stringify(getMediaId));
-
-    logger.info("getChannel")
+    logger.info("getChannel");
     logger.info(JSON.stringify(getChannel));
-
-    // fs.readFile('response.bin', (err, data) => {
-    //     if (err) throw err;
-    //     const buf = Buffer.from(data);
-    //     res.writeHead(200, {
-    //         'Content-Type': 'image/jpeg',
-    //         'Content-disposition': 'attachment; filename=data.jpeg'
-    //     });
-    //     res.write(buf);
-    //     res.end();
-    // });
-
-    request({
-        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxygetimage/api/wa/v1/media/get",
-        method: 'POST',
-        json: {
-            "channel": getChannel,
-            "mediaId": getMediaId
-        },
-        headers: {
-            "Content-Type": "application/json",
-            "accept": "image/jpeg"
-        },
-    }, function (error, newRes) {
-        console.log(error)
-        console.log(newRes)
-        if (error) {
-            res.status(500).send({})
-        } else {
-            const buf = Buffer.from(newRes);
-            res.writeHead(200, {
-                'Content-Type': 'image/jpeg',
-                'Content-disposition': 'attachment; filename=data.jpeg'
-            });
-            res.write(buf);
-            res.end();
-        }
-    }).pipe(res);
-})
-
-router.get('/getmedia/:mediaid/:channel/:filename\.:ext?', async ({params}, res) => {
-    var getMediaId = params.mediaid
-    var getChannel = params.channel
-
-    logger.info("getMediaId")
-    logger.info(JSON.stringify(getMediaId));
-
-    logger.info("getChannel")
-    logger.info(JSON.stringify(getChannel));
-
-    // fs.readFile('response.bin', (err, data) => {
-    //     if (err) throw err;
-    //     const buf = Buffer.from(data);
-    //     res.writeHead(200, {
-    //         'Content-Type': 'image/jpeg',
-    //         'Content-disposition': 'attachment; filename=data.jpeg'
-    //     });
-    //     res.write(buf);
-    //     res.end();
-    // });
 
     request({
         url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxygetimage/api/wa/v1/media/get",
@@ -314,22 +253,26 @@ router.get('/getmedia/:mediaid/:channel/:filename\.:ext?', async ({params}, res)
             "accept": "image/jpeg"
         },
     }, function (error, newRes) {
-        console.log(error)
-        console.log(newRes)
+        console.log(error);
+        // console.log(newRes.body);
         if (error) {
-            res.status(500).send({})
-        } else {
-            const buf = Buffer.from(newRes);
-            res.writeHead(200, {
-                'Content-Type': 'image/jpeg',
-                'Content-disposition': 'attachment; filename=data.jpeg'
-            });
-            res.write(buf);
+            res.status(500).send({});
+        }
+        else {
+            const buf = Buffer.from(newRes.body);
+            // res.writeHead(200, {
+            //     'Content-Type': 'image/jpeg',
+            //     'Content-disposition': 'attachment; filename=data.jpeg'
+            // });
+            // res.write(buf);
             res.end();
         }
     }).pipe(res);
-})
+};
 
+router.get('/getmedia/:mediaid/:channel/:filename\.:ext?', getMedia)
+router.post('/getmedia/:mediaid/:channel/:filename\.:ext?', getMedia)
+ 
 // IGNORE - only for testing
 router.get('/testing-image', (req, res, next) => {
     request({
@@ -472,6 +415,10 @@ function addDomain (jendekDomainName, jendekDomainPushId, jendekDomainToken, res
         })
     })
     conn.end();
+}
+
+function getImage (res) {
+    
 }
 
 module.exports = router;
