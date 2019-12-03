@@ -10,6 +10,7 @@ var requestPromise = require('request-promise');
 var jendek_domain_table = 'jendek-domain';
 
 var jendek_domain = "bcafinancehelp1569566623"
+var jendek_group_agent_fieldid = "360030138314"
 
 router.get('/manifest', (req, res, next) => {
     // let host = req.hostname
@@ -179,7 +180,8 @@ router.post('/integration/push', (req, res, next) => {
     let instance_push_id = req.body.push_id;
     let token_push = req.body.token;
     let created_at = req.body.created_at;
-    let sender = req.body.sender
+    let sender = req.body.sender;
+    let fieldGroupAgent = req.body.group_agent;
     let msgObj = {};
 
     console.log(JSON.stringify(req.body));
@@ -196,6 +198,12 @@ router.post('/integration/push', (req, res, next) => {
             external_id: jendekUserExternalId,
             name: req.body.to
         },
+        fields: [
+            {
+                id: jendek_group_agent_fieldid,
+                value: fieldGroupAgent
+            }
+        ],
         allow_channelback: true
     }
     externalRsrc.push(msgObj);
