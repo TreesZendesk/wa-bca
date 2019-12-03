@@ -9,6 +9,8 @@ var requestPromise = require('request-promise');
 
 var jendek_domain_table = 'jendek-domain';
 
+var jendek_domain = "bcafinancehelp1569566623"
+
 router.get('/manifest', (req, res, next) => {
     // let host = req.hostname
     let host = "expo.bcaf.id/zConnector"
@@ -29,7 +31,7 @@ router.get('/manifest', (req, res, next) => {
 })
 
 router.post('/integration/admin', (req, res, next) => {
-    console.log(req.body);
+    // console.log(req.body);
     logger.info(JSON.stringify(req.body));
     res.render('admin', {
         title: 'CIF Admin',
@@ -51,7 +53,7 @@ router.get('/integration/admin', (req, res, next) => {
 })
 
 router.post('/integration/register', (req, res, next) => {
-    console.log(req.body);
+    // console.log(req.body);
     logger.info(JSON.stringify(req.body));
     
     let metadata = {};
@@ -63,7 +65,7 @@ router.post('/integration/register', (req, res, next) => {
     metadata['sender'] = req.body.sender;
 
     let name = "Whatsapp : " + req.body.phone
-    addDomain('domain123', req.body.instance_push_id, 'token123', res);
+    // addDomain('domain123', req.body.instance_push_id, 'token123', res);
 
     res.render('register', {
         title: 'CIF Confirmation Page',
@@ -143,7 +145,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
     console.log(externalRsrcs);
     logger.info(JSON.stringify(externalRsrcs));
 
-    var pushJendekUrl = 'https://conrokitvhelp1572418560.zendesk.com/api/v2/any_channel/push.json';
+    var pushJendekUrl = 'https://' + jendek_domain + '.zendesk.com/api/v2/any_channel/push.json';
 
     console.log(JSON.stringify(externalRsrcs));
     request({
@@ -204,7 +206,7 @@ router.post('/integration/push', (req, res, next) => {
 
     console.log(externalRsrcs);
 
-    var pushJendekUrl = 'https://conrokitvhelp1572418560.zendesk.com/api/v2/any_channel/push.json';
+    var pushJendekUrl = 'https://' + jendek_domain + '.zendesk.com/api/v2/any_channel/push.json';
 
     console.log(JSON.stringify(externalRsrcs));
     request({
@@ -358,8 +360,6 @@ router.post('/integration/channelback', async (req, res, next) => {
 
         for (var i=0; i<urls.length; i++) {
             let newFileUrl = urls[i]
-            console.log("========")
-            console.log(newFileUrl)
             var formData = {
                 mediaType: "image",
                 file: request(newFileUrl),
@@ -434,7 +434,7 @@ router.get('/get_domain', (req, res, next) => {
 })
 
 router.get('/add_domain', (req, res, next) => {
-    addDomain('domain123', 'push123', 'token123', res);
+    // addDomain('domain123', 'push123', 'token123', res);
 })
 
 function generateFileUrl (req, mediaId, channel) {
@@ -465,30 +465,30 @@ function getDomain (res) {
     conn.end();
 }
 
-function addDomain (jendekDomainName, jendekDomainPushId, jendekDomainToken, res) {
-    let dbResponse = {};
-    let insertData = {
-        jendek_domain_name: jendekDomainName,
-        jendek_domain_push_id: jendekDomainPushId,
-        jendek_domain_token: jendekDomainToken
-    }
-    let insertQry = 'INSERT INTO `' + jendek_domain_table + '` SET ?';
-    conn.connect();
-    conn.query(insertQry, insertData, function (error, rows, field) {
-        if (error) {
-            dbResponse = {
-                error: error
-            };
-        } else {
-            dbResponse = {
-                success: rows
-            };
-        }
-        res.status(200).send({
-            response: dbResponse
-        })
-    })
-    conn.end();
-}
+// function addDomain (jendekDomainName, jendekDomainPushId, jendekDomainToken, res) {
+//     let dbResponse = {};
+//     let insertData = {
+//         jendek_domain_name: jendekDomainName,
+//         jendek_domain_push_id: jendekDomainPushId,
+//         jendek_domain_token: jendekDomainToken
+//     }
+//     let insertQry = 'INSERT INTO `' + jendek_domain_table + '` SET ?';
+//     conn.connect();
+//     conn.query(insertQry, insertData, function (error, rows, field) {
+//         if (error) {
+//             dbResponse = {
+//                 error: error
+//             };
+//         } else {
+//             dbResponse = {
+//                 success: rows
+//             };
+//         }
+//         res.status(200).send({
+//             response: dbResponse
+//         })
+//     })
+//     conn.end();
+// }
 
 module.exports = router;
