@@ -57,14 +57,15 @@ router.post('/integration/register', (req, res, next) => {
     logger.info(JSON.stringify(req.body));
     
     let metadata = {};
+    let sender = req.body.sender
     metadata['instance_push_id'] = req.body.instance_push_id;
     metadata['zendesk_access_token'] = req.body.zendesk_access_token;
     metadata['subdomain'] = req.body.subdomain;
     metadata['locale'] = req.body.locale;
     metadata['return_url'] = req.body.return_url;
-    metadata['sender'] = req.body.sender;
+    metadata['sender'] = sender;
 
-    let name = "Whatsapp : " + req.body.phone
+    let name = "Whatsapp : " + req.body.phone + " - " + sender
     // addDomain('domain123', req.body.instance_push_id, 'token123', res);
 
     res.render('register', {
