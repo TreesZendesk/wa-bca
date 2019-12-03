@@ -181,10 +181,12 @@ router.post('/integration/push', (req, res, next) => {
     let token_push = req.body.token;
     let created_at = req.body.created_at;
     let sender = req.body.sender;
-    let fieldGroupAgent = req.body.group_agent;
+    let fieldGroupAgent = req.body.terminalID || ""
     let msgObj = {};
 
+
     console.log(JSON.stringify(req.body));
+    logger.info("-PUSH PROACTIVE-");
     logger.info(JSON.stringify(req.body));
     var jendekExternalId = 'wa-msg-' + uuid.v4() + '-' + sender
     var jendekUserExternalId = 'wa-user-' + req.body.to
@@ -201,7 +203,7 @@ router.post('/integration/push', (req, res, next) => {
         fields: [
             {
                 id: jendek_group_agent_fieldid,
-                value: fieldGroupAgent
+                value: fieldGroupAgent.replace(/[^a-zA-Z0-9\-]/g,'_').toLowerCase()
             }
         ],
         allow_channelback: true
