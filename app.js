@@ -23,7 +23,7 @@ app.set('view engine', 'jade');
 // app.use(morgan('dev'));
 app.use(morgan("combined", { 
   stream: { write: message => logger.info(message.trim()) },
-  skip: (req, res) => req.url !== "/jendek/integration/pull"
+  skip: (req, res) => req.originalUrl.startsWith("/jendek/integration/pull")
 }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
