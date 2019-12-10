@@ -9,17 +9,28 @@ const logzioWinstonTransport = new LogzioWinstonTransport({
   token: 'FhBWXLLGSTKqTlZYOAjqfhigodGrBTPv',
 });
 
-
-const customFormat = format.printf(({ level, message, label, timestamp }) => {
+const addTraceId = format((info, opts) => {
   var traceId = httpContext.get("traceId")
-  message = traceId ? " traceId: " + traceId + " " + message : message;
+  info.traceId = traceId
+  return info;
+});
+
+const customFormat = format.printf(({ level, message, label, timestamp, opts}) => {
+  var traceId = httpContext.get("traceId")
+  message = traceId ? " traceId: " + traceId + " " + message : "HALLO" + message;
   return message;
 });
 
-const logger = winston.createLogger({
-    format: customFormat,
-    transports: [logzioWinstonTransport, new transports.Console()],
-});
+const config = {
+  format: format.combine(
+    format.simple(),
+    addTraceId(),
+    customFormat
+  ),
+  transports: [logzioWinstonTransport, new transports.Console()],
+}
+
+const logger = winston.createLogger(config);
 
 logger.log('warn', 'Just a test message');
 

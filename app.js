@@ -2,12 +2,13 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+var morgan = require('morgan');
 var proxy = require('express-http-proxy');
 var proxyNew = require('http-proxy-middleware');
 var uuid = require('node-uuid');
 var httpContext = require('express-http-context');
 
+var logger = require('./config/winston')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var jendekRouter = require('./routes/jendek');
@@ -19,7 +20,8 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
-app.use(logger('dev'));
+// app.use(morgan('dev'));
+app.use(morgan("combined", { stream: { write: message => logger.info(message.trim()) }}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
