@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var proxy = require('express-http-proxy');
 var proxyNew = require('http-proxy-middleware');
+var uuid = require('node-uuid');
+var httpContext = require('express-http-context');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -22,7 +24,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(httpContext.middleware);
+app.use((req, res, next) => {
+  httpContext.set('traceId', req.body.request_unique_identifier || uuid.v4())
+  next()
+});
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/jendek', jendekRouter);

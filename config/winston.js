@@ -1,5 +1,6 @@
 const winston = require('winston');
 const LogzioWinstonTransport = require('winston-logzio');
+const httpContext = require('express-http-context');
 const { createLogger, format, transports } = winston;
 
 const logzioWinstonTransport = new LogzioWinstonTransport({
@@ -9,9 +10,15 @@ const logzioWinstonTransport = new LogzioWinstonTransport({
 });
 
 
+const customFormat = format.printf(({ level, message, label, timestamp }) => {
+  var traceId = httpContext.get("traceId")
+  message = traceId ? " traceId: " + traceId + " " + message : message;
+  return message;
+});
+
 const logger = winston.createLogger({
-    format: format.simple(),
-    transports: [logzioWinstonTransport],
+    format: customFormat,
+    transports: [logzioWinstonTransport, new transports.Console()],
 });
 
 logger.log('warn', 'Just a test message');
