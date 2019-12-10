@@ -21,7 +21,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // app.use(morgan('dev'));
-app.use(morgan("combined", { stream: { write: message => logger.info(message.trim()) }}))
+app.use(morgan("combined", { 
+  stream: { write: message => logger.info(message.trim()) },
+  skip: (req, res) => req.url == "/jendek/pull"
+}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
