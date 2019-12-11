@@ -11,6 +11,7 @@
     "express": "~4.16.1",
     "express-http-context": "^1.2.3",
     "express-http-proxy": "^1.6.0",
+    "express-validator": "^6.3.0",
     "express-winston": "^4.0.1",
     "fs": "0.0.1-security",
     "http-errors": "~1.6.3",

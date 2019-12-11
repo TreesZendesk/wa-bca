@@ -6,6 +6,7 @@ const uuid = require('uuid');
 const logger = require('../config/winston')
 var fs  = require('fs');
 var requestPromise = require('request-promise');
+const { check, validationResult } = require('express-validator');
 
 var jendek_domain_table = 'jendek-domain';
 
@@ -31,9 +32,20 @@ router.get('/manifest', (req, res, next) => {
     })
 })
 
-router.post('/integration/admin', (req, res, next) => {
-    // console.log(req.body);
+router.post('/integration/admin', [
+    check('return_url').exists(),
+    check('instance_push_id').exists(),
+    check('zendesk_access_token').exists(),
+    check('locale').exists(),
+    check('subdomain').exists()
+], (req, res, next) => {
     logger.info(JSON.stringify(req.body));
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
     res.render('admin', {
         title: 'CIF Admin',
         return_url: req.body.return_url,
@@ -53,9 +65,23 @@ router.get('/integration/admin', (req, res, next) => {
     });
 })
 
-router.post('/integration/register', (req, res, next) => {
-    // console.log(req.body);
+router.post('/integration/register', [
+    check('phone').exists(),
+    check('instance_push_id').exists(),
+    check('zendesk_access_token').exists(),
+    check('subdomain').exists(),
+    check('locale').exists(),
+    check('return_url').exists(),
+    check('sender').exists(),
+    check('show_instance_push_id').exists(),
+    check('show_zendesk_access_token').exists()
+], (req, res, next) => {
     logger.info(JSON.stringify(req.body));
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
     
     let metadata = {};
     let sender = req.body.sender
