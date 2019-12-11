@@ -58,7 +58,6 @@ router.post('/integration/admin', [
 
  /* for testing, ignore this */
 router.get('/integration/admin', (req, res, next) => {
-    console.log(req.body.return_url);
     logger.info(JSON.stringify(req.body.return_url));
     res.render('admin', {
         title: 'CIF Admin'
@@ -102,6 +101,7 @@ router.post('/integration/register', [
 })
 
 router.post('/integration/push/from-core', (req, res, next) => {
+    logger.info(JSON.stringify(req.body));
     let externalRsrc = [];
     let externalRsrcs = {};
     let instance_push_id = req.body.push_id;
@@ -110,9 +110,6 @@ router.post('/integration/push/from-core', (req, res, next) => {
 
     let msgObj = {};
 
-    console.log(JSON.stringify(req.body));
-    logger.info(JSON.stringify(req.body));
-    console.log(req.body.messages)
     for (var i=0; i<req.body.messages.length; i++) {
         let userName = ""
         for (var j=0; j<req.body.contacts.length; j++) {
@@ -167,12 +164,10 @@ router.post('/integration/push/from-core', (req, res, next) => {
         external_resources: externalRsrc
     }
 
-    console.log(externalRsrcs);
     logger.info(JSON.stringify(externalRsrcs));
 
     var pushJendekUrl = 'https://' + jendek_domain + '.zendesk.com/api/v2/any_channel/push.json';
 
-    console.log(JSON.stringify(externalRsrcs));
     request({
         url: pushJendekUrl,
         method: 'POST',
@@ -181,7 +176,6 @@ router.post('/integration/push/from-core', (req, res, next) => {
         },
         json: externalRsrcs
     }, function (err, newRes) {
-        console.log(newRes.statusCode);
         logger.info(JSON.stringify(newRes.statusCode));
         if (newRes.statusCode == 200) {
             res.status(200).send({
@@ -198,6 +192,8 @@ router.post('/integration/push/from-core', (req, res, next) => {
 })
 
 router.post('/integration/push', (req, res, next) => {
+    logger.info(JSON.stringify(req.body));
+
     let externalRsrc = [];
     let externalRsrcs = {};
     let instance_push_id = req.body.push_id;
@@ -208,9 +204,6 @@ router.post('/integration/push', (req, res, next) => {
     let msgObj = {};
 
 
-    console.log(JSON.stringify(req.body));
-    logger.info("-PUSH PROACTIVE-");
-    logger.info(JSON.stringify(req.body));
     var jendekExternalId = 'wa-msg-' + uuid.v4() + '-' + sender
     var jendekUserExternalId = 'wa-user-' + req.body.to
     var jendekThreadExternalId = 'wa-conv-' + req.body.to + '-' + sender
@@ -238,11 +231,10 @@ router.post('/integration/push', (req, res, next) => {
         external_resources: externalRsrc
     }
 
-    console.log(externalRsrcs);
 
+    logger.info(externalRsrcs)
     var pushJendekUrl = 'https://' + jendek_domain + '.zendesk.com/api/v2/any_channel/push.json';
 
-    console.log(JSON.stringify(externalRsrcs));
     request({
         url: pushJendekUrl,
         method: 'POST',
@@ -251,7 +243,6 @@ router.post('/integration/push', (req, res, next) => {
         },
         json: externalRsrcs
     }, function (err, newRes) {
-        console.log(newRes.statusCode);
         logger.info(JSON.stringify(newRes.statusCode));
         if (newRes.statusCode == 200) {
             res.status(200).send({
@@ -292,8 +283,7 @@ const getMedia = async ({ params }, res) => {
             "accept": "image/jpeg"
         },
     }, function (error, newRes) {
-        // console.log(error);
-        // console.log(newRes.body);
+        logger.info(newRes.body)
         if (error || newRes.body.status == "500") {
             res.status(500).send({});
         }
@@ -318,7 +308,6 @@ router.get('/testing-image', (req, res, next) => {
         url: 'https://faskanskk1571648431.zendesk.com/attachments/token/iyselTHQrof21Jx95HlrrNBnM/?name=image-from-ios.jpg',
         method: 'GET',
     }, function (error, newRes) {
-        console.log(newRes)
         let imageData = newRes.body
 
         let imageUploadUrl = ''
@@ -341,21 +330,19 @@ router.get('/testing-image', (req, res, next) => {
         
         request(uploadImageRequest, function (err, uploadRes, body) {
             if (err) {
-                console.log(err);
+                logger.error(err)
             }
-            console.log(body);
-            console.log(uploadRes)
+            logger.info(uploadRes)
+            logger.info(body)
             res.status(200).send(uploadRes)
         });
     })
 })
 
 router.post('/integration/channelback', async (req, res, next) => {
-    console.log(req.body);
     logger.info(JSON.stringify(req.body))
     let metadata = JSON.parse(req.body['metadata'])
 
-    // console.log(fs.createReadStream('http://localhost:3000/proxy/mock.jpeg.png'))
     // let push_id = metadata.instance_push_id
     // let token_id = metadata.token_id
     let to = req.body.thread_id.split("-")[2]
@@ -390,7 +377,7 @@ router.post('/integration/channelback', async (req, res, next) => {
         let fileUrl = ''
         let fileUrls = req.body["file_urls[]"]
         let urls = fileUrls instanceof Array ? fileUrls : [fileUrls]
-        console.log(urls) 
+        logger.info(urls)
 
         for (var i=0; i<urls.length; i++) {
             let newFileUrl = urls[i]
@@ -409,13 +396,13 @@ router.post('/integration/channelback', async (req, res, next) => {
             };
 
             let uploadRes = await requestPromise(uploadMedia)
-            // console.log(uploadResponse)
+            logger.info(uploadRes)
             let uploadResponse = JSON.parse(uploadRes)
 
             if (uploadResponse.statusCode == "00") {
                 let uploadId = uploadResponse.media[0].id
                 
-                console.log(uploadId)
+                logger.info(uploadId)
 
                 let imgCaption = ''
                 if ((i+1) == urls.length) {
@@ -457,7 +444,7 @@ router.post('/integration/channelback', async (req, res, next) => {
 })
 
 router.post('/integration/clickthrough', (req, res, next) => {
-    console.log(req.body);
+    logger.info(req.body)
     res.status(200).send({
         error: "system is not ready"
     });
