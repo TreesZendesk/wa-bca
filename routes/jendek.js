@@ -71,10 +71,7 @@ router.post('/integration/register', [
     check('zendesk_access_token').exists(),
     check('subdomain').exists(),
     check('locale').exists(),
-    check('return_url').exists(),
-    check('sender').exists(),
-    check('show_instance_push_id').exists(),
-    check('show_zendesk_access_token').exists()
+    check('sender').exists()
 ], (req, res, next) => {
     logger.info(JSON.stringify(req.body));
 
