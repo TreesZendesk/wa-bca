@@ -176,16 +176,18 @@ router.post('/integration/push/from-core', (req, res, next) => {
         },
         json: externalRsrcs
     }, function (err, newRes) {
-        logger.info(JSON.stringify(newRes.statusCode));
+        if (err) {
+            logger.error(JSON.stringify(err))
+            return res.status(500).send({
+                error: "error"
+            });
+        }
+
+        logger.info(JSON.stringify(newRes));
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
                 response: newRes["status"]
-            });
-        } else {
-            res.status(500).send({
-                error: "error",
-                reason: err
             });
         }
     });
@@ -243,15 +245,18 @@ router.post('/integration/push', (req, res, next) => {
         },
         json: externalRsrcs
     }, function (err, newRes) {
-        logger.info(JSON.stringify(newRes.statusCode));
+        if (err) {
+            logger.error(JSON.stringify(err))
+            return res.status(500).send({
+                error: "error"
+            });
+        }
+
+        logger.info(JSON.stringify(newRes));
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
                 response: newRes["status"]
-            });
-        } else {
-            res.status(500).send({
-                error: "error",
             });
         }
     });
