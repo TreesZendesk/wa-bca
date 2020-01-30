@@ -7,6 +7,7 @@ const logger = require('../config/winston')
 var fs  = require('fs');
 var requestPromise = require('request-promise');
 const { check, validationResult } = require('express-validator');
+const httpContext = require('express-http-context');
 
 var jendek_domain_table = 'jendek-domain';
 
@@ -174,21 +175,29 @@ router.post('/integration/push/from-core', (req, res, next) => {
         headers: {
             'Authorization': 'Bearer ' + token_push
         },
+        time: true,
         json: externalRsrcs
     }, function (err, newRes) {
+        logger.info("Called api/v2/any_channel/push");
         if (err) {
-            logger.error(JSON.stringify(err))
+            logger.error(err)
             return res.status(500).send({
-                error: "error"
+                error: "error",
+                traceId: httpContext.get("traceId")
             });
         }
 
-        logger.info(JSON.stringify(newRes));
+        logger.info(JSON.stringify({statusCode: newRes.statusCode, elapsedTime: newRes.elapsedTime + " ms", responseBody: newRes.body}))
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
                 response: newRes["status"]
             });
+        } else {
+            res.status(newRes.statusCode).send({
+                error: "error",                
+                traceId: httpContext.get("traceId")
+            })
         }
     });
 })
@@ -243,21 +252,29 @@ router.post('/integration/push', (req, res, next) => {
         headers: {
             'Authorization': 'Bearer ' + token_push
         },
+        time: true,
         json: externalRsrcs
     }, function (err, newRes) {
+        logger.info("Called api/v2/any_channel/push");
         if (err) {
-            logger.error(JSON.stringify(err))
+            logger.error(err)
             return res.status(500).send({
-                error: "error"
+                error: "error",
+                traceId: httpContext.get("traceId")
             });
         }
 
-        logger.info(JSON.stringify(newRes));
+        logger.info(JSON.stringify({statusCode: newRes.statusCode, elapsedTime: newRes.elapsedTime + " ms", responseBody: newRes.body}))
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
                 response: newRes["status"]
             });
+        } else {
+            res.status(newRes.statusCode).send({
+                error: "error",                
+                traceId: httpContext.get("traceId")
+            })
         }
     });
 })
@@ -369,11 +386,20 @@ router.post('/integration/channelback', async (req, res, next) => {
                 }
             }
         }, function (error, chatRes) {
-            if (chatRes.body.statusCode == "00") {
+            if (error) {
+                logger.error(error)
+                return res.status(500).send({
+                    error: "error",
+                    traceId: httpContext.get("traceId")
+                });
+            }
+
+            if (chatRes.body && chatRes.body.statusCode == "00") {
                 res.status(200).send({...chatRes.body, external_id: chatRes.body.transactionRefNo});
             } else {
                 res.status(500).send({
                     error: "error",
+                    traceId: httpContext.get("traceId")                    
                 });
             }
         });
