@@ -27,7 +27,7 @@ const config = {
     addTraceId(),
     customFormat
   ),
-  transports: [new transports.Console()],
+  transports: [logzioWinstonTransport, new transports.Console()],
 }
 
 const logger = winston.createLogger(config);
