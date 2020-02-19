@@ -48,6 +48,7 @@ app.use('/wacoreproxyv2', proxyNew({ target: 'http://192.168.29.189:9001', chang
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
+  console.log(req.headers)
   next(createError(404));
 });
 
