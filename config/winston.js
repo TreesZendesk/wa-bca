@@ -40,7 +40,7 @@ const config = {
     addTraceId(),
     customFormat
   ),
-  transports: [DailyRotateFileTransport, logzioWinstonTransport, new transports.Console()],
+  transports: [logzioWinstonTransport, new transports.Console()],
 }
 
 const logger = winston.createLogger(config);
