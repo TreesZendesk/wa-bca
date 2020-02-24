@@ -293,7 +293,7 @@ const getMedia = async ({ params }, res) => {
     logger.info(JSON.stringify(getChannel));
 
     request({
-        url: "https://bcafelearning.bcaf.id/zConnector/wacoreproxygetimage/api/wa/v1/media/get",
+        url: "http://192.168.29.191:9010/api/wa/v1/media/get",
         rejectUnauthorized: false,
         method: 'POST',
         json: {
