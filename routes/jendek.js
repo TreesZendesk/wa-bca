@@ -9,21 +9,21 @@ var requestPromise = require('request-promise');
 const { check, validationResult } = require('express-validator');
 const httpContext = require('express-http-context');
 
-var jendek_domain_table = 'jendek-domain';
+var jendek_domain_table = process.env.DOMAIN_TABLE || 'jendek-domain';
 
-var jendek_domain = "bcafinancehelp1569566623"
-var jendek_group_agent_fieldid = "360030138314"
+var jendek_domain = process.env.ZENDESK_SUBDOMAIN || "bcafinancehelp1569566623"
+var jendek_group_agent_fieldid = process.env.GROUP_AGENT_FIELDID || "360030138314"
 
 router.get('/manifest', (req, res, next) => {
     // let host = req.hostname
-    let host = "expo.bcaf.id/zConnector"
+    let host = process.env.CIF_HOST || "expo.bcaf.id/zConnector"
 
-    res.status(200).send({
+     res.status(200).send({
         name: "WhatsApp-bca",
-        id: "new-bca-zendesk-wa.uniquebcaf",
+        id: process.env.CIF_ID || "new-bca-zendesk-wa.uniquebcaf",
         author: "Trees Solutions",
-        version: "v1.0.0",
-        push_client_id: "zd_trees_integration",
+        version: process.env.CIF_VERSION || "v1.0.0",
+        push_client_id: process.env.CIF_PUSH_CLIENT_ID || "zd_trees_integration",
         urls: {
             admin_ui: "https://" + host + "/jendek/integration/admin",
             pull_url: "https://" + host + "/jendek/integration/pull",
