@@ -15,7 +15,6 @@ var jendek_domain = process.env.ZENDESK_SUBDOMAIN || "bcafinancehelp1569566623"
 var jendek_group_agent_fieldid = process.env.GROUP_AGENT_FIELDID || "360030138314"
 
 router.get('/manifest', (req, res, next) => {
-    // let host = req.hostname
     let host = process.env.CIF_HOST || "expo.bcaf.id/zConnector"
 
      res.status(200).send({
@@ -90,7 +89,6 @@ router.post('/integration/register', [
     metadata['sender'] = sender;
 
     let name = "Whatsapp : " + req.body.phone + " - " + sender
-    // addDomain('domain123', req.body.instance_push_id, 'token123', res);
 
     res.render('register', {
         title: 'CIF Confirmation Page',
@@ -481,66 +479,9 @@ router.post('/integration/clickthrough', (req, res, next) => {
     });
 })
 
-router.get('/get_domain', (req, res, next) => {
-    getDomain(res);
-})
-
-router.get('/add_domain', (req, res, next) => {
-    // addDomain('domain123', 'push123', 'token123', res);
-})
-
 function generateFileUrl (req, mediaId, channel) {
-    // let host = req.hostname
     let imgServer = "expo.bcaf.id"
     return "https://" + imgServer + "/zConnector/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpeg"
 }
-
-function getDomain (res) {
-    let dbResponse = {};
-    let getQry = 'SELECT * FROM `' + jendek_domain_table + '`';
-    conn.connect();
-
-    conn.query(getQry, function (error, rows, fields) {
-        if (error) {
-            dbResponse = {
-                error: error
-            }
-        } else {
-            dbResponse = {
-                success: rows
-            }
-        }
-        res.status(200).send({
-            response: dbResponse
-        });
-    });
-    conn.end();
-}
-
-// function addDomain (jendekDomainName, jendekDomainPushId, jendekDomainToken, res) {
-//     let dbResponse = {};
-//     let insertData = {
-//         jendek_domain_name: jendekDomainName,
-//         jendek_domain_push_id: jendekDomainPushId,
-//         jendek_domain_token: jendekDomainToken
-//     }
-//     let insertQry = 'INSERT INTO `' + jendek_domain_table + '` SET ?';
-//     conn.connect();
-//     conn.query(insertQry, insertData, function (error, rows, field) {
-//         if (error) {
-//             dbResponse = {
-//                 error: error
-//             };
-//         } else {
-//             dbResponse = {
-//                 success: rows
-//             };
-//         }
-//         res.status(200).send({
-//             response: dbResponse
-//         })
-//     })
-//     conn.end();
-// }
 
 module.exports = router;
