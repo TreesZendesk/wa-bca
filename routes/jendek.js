@@ -465,7 +465,7 @@ router.post('/integration/channelback', async (req, res, next) => {
 })
 
 router.post('/integration/clickthrough', (req, res, next) => {
-    logger.info(req.body)
+    logger.info(JSON.stringify(req.body))
     res.status(200).send({
         error: "system is not ready"
     });

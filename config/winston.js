@@ -15,7 +15,8 @@ const DailyRotateFileTransport = new (winston.transports.DailyRotateFile)({
   datePattern: 'YYYY-MM-DD',
   maxSize: '20m',
   maxFiles: '7d',
-  json: false
+  json: false,
+  handleExceptions: true
   }
 );
 
