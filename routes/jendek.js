@@ -11,12 +11,12 @@ const httpContext = require('express-http-context');
 
 const JENDEK_DOMAIN = process.env.ZENDESK_SUBDOMAIN || "bcafinancehelp1569566623"
 const JENDEK_GROUP_AGENT_FIELDID = process.env.GROUP_AGENT_FIELDID || "360030138314"
-const HOST = process.env.CIF_HOST || "expo.bcaf.id/zConnector"
+const CIF_HOST = process.env.CIF_HOST || "expo.bcaf.id/zConnector"
 const CIF_ID = process.env.CIF_ID || "new-bca-zendesk-wa.uniquebcaf"
 const CIF_VERSION = process.env.CIF_VERSION || "v1.0.0";
 const CIF_PUSH_CLIENT_ID = process.env.CIF_PUSH_CLIENT_ID || "zd_trees_integration";
-const WA_URL = "http://192.168.29.189:9001"
-const WA_MEDIA_URL = "http://192.168.29.191:9010"
+const WA_URL = process.env.WA_URL || "http://192.168.29.189:9001"
+const WA_MEDIA_URL = process.env.WA_MEDIA_URL || "http://192.168.29.191:9010"
 
 router.get('/manifest', (req, res, next) => {
      res.status(200).send({
@@ -26,10 +26,10 @@ router.get('/manifest', (req, res, next) => {
         version: CIF_VERSION,
         push_client_id: CIF_PUSH_CLIENT_ID,
         urls: {
-            admin_ui: "https://" + HOST + "/jendek/integration/admin",
-            pull_url: "https://" + HOST + "/jendek/integration/pull",
-            channelback_url: "https://" + HOST + "/jendek/integration/channelback",
-            clickthrough_url: "https://" + HOST + "/jendek/integration/clickthrough"
+            admin_ui: "https://" + CIF_HOST + "/jendek/integration/admin",
+            pull_url: "https://" + CIF_HOST + "/jendek/integration/pull",
+            channelback_url: "https://" + CIF_HOST + "/jendek/integration/channelback",
+            clickthrough_url: "https://" + CIF_HOST + "/jendek/integration/clickthrough"
         }
     })
 })
@@ -483,7 +483,7 @@ router.post('/integration/clickthrough', (req, res, next) => {
 
 function generateFileUrl (req, mediaId, channel) {
     let imgServer = "expo.bcaf.id"
-    let url = "https://" + HOST + "/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpeg"
+    let url = "https://" + CIF_HOST + "/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpeg"
     return url
 }
 
