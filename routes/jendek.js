@@ -9,13 +9,14 @@ var requestPromise = require('request-promise');
 const { check, validationResult } = require('express-validator');
 const httpContext = require('express-http-context');
 
-const JENDEK_DOMAIN_TABLE = process.env.DOMAIN_TABLE || 'jendek-domain';
 const JENDEK_DOMAIN = process.env.ZENDESK_SUBDOMAIN || "bcafinancehelp1569566623"
 const JENDEK_GROUP_AGENT_FIELDID = process.env.GROUP_AGENT_FIELDID || "360030138314"
 const HOST = process.env.CIF_HOST || "expo.bcaf.id/zConnector"
 const CIF_ID = process.env.CIF_ID || "new-bca-zendesk-wa.uniquebcaf"
 const CIF_VERSION = process.env.CIF_VERSION || "v1.0.0";
 const CIF_PUSH_CLIENT_ID = process.env.CIF_PUSH_CLIENT_ID || "zd_trees_integration";
+const WA_URL = "http://192.168.29.189:9001"
+const WA_MEDIA_URL = "http://192.168.29.191:9010"
 
 router.get('/manifest', (req, res, next) => {
      res.status(200).send({
@@ -292,7 +293,7 @@ const getMedia = async ({ params }, res) => {
     logger.info(JSON.stringify(getChannel));
 
     request({
-        url: "http://192.168.29.191:9010/api/wa/v1/media/get",
+        url: WA_MEDIA_URL + "/api/wa/v1/media/get",
         rejectUnauthorized: false,
         method: 'POST',
         json: {
@@ -335,7 +336,7 @@ router.get('/testing-image', (req, res, next) => {
 
         const uploadImageRequest = {
             method: "POST",
-            url: "http://192.168.29.189:9001/api/wa/v1/media/upload",
+            url: WA_URL + "/api/wa/v1/media/upload",
             headers: {
                 "Content-Type": "multipart/form-data"
             },
@@ -370,7 +371,7 @@ router.post('/integration/channelback', async (req, res, next) => {
 
     if (!req.body["file_urls[]"]) {
         request({
-            url: "http://192.168.29.189:9001/api/wa/v1/text/send",
+            url: WA_URL + "/api/wa/v1/text/send",
             method: 'POST',
             json: {
                 "channelID": "102",
@@ -421,7 +422,7 @@ router.post('/integration/channelback', async (req, res, next) => {
             }
             var uploadMedia = {
                 method: 'POST',
-                uri: 'http://192.168.29.189:9001/api/wa/v1/media/upload',
+                uri: WA_URL + '/api/wa/v1/media/upload',
                 formData: formData,
             };
 
@@ -441,7 +442,7 @@ router.post('/integration/channelback', async (req, res, next) => {
                     imgCaption = ''
                 }
                 var sendMessage = {
-                    url: "http://192.168.29.189:9001/api/wa/v1/media/send",
+                    url: WA_URL + "/api/wa/v1/media/send",
                     method: 'POST',
                     json: {
                         "channelID": "102",
@@ -482,7 +483,7 @@ router.post('/integration/clickthrough', (req, res, next) => {
 
 function generateFileUrl (req, mediaId, channel) {
     let imgServer = "expo.bcaf.id"
-    let url = "https://" + imgServer + "/zConnector/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpeg"
+    let url = "https://" + HOST + "/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpeg"
     return url
 }
 
