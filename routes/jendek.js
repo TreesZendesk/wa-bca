@@ -1,10 +1,8 @@
 var express = require('express');
 var router = express.Router();
-var conn = require('../db/conn');
 const request = require('request');
 const uuid = require('uuid');
 const logger = require('../config/winston')
-var fs  = require('fs');
 var requestPromise = require('request-promise');
 const { check, validationResult } = require('express-validator');
 const httpContext = require('express-http-context');
@@ -55,14 +53,6 @@ router.post('/integration/admin', [
         zendesk_access_token: req.body.zendesk_access_token,
         locale: req.body.locale,
         subdomain: req.body.subdomain
-    });
-})
-
- /* for testing, ignore this */
-router.get('/integration/admin', (req, res, next) => {
-    logger.info(JSON.stringify(req.body.return_url));
-    res.render('admin', {
-        title: 'CIF Admin'
     });
 })
 
@@ -139,7 +129,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
         } else if (msgType == "image") {
             var imageChannel = req.body.channel
             var imageId = req.body.messages[i].image.id
-            var fileUrl = generateFileUrl(req, imageId, imageChannel)
+            var fileUrl = generateFileUrl(imageId, imageChannel)
 
             msgObj = {
                 external_id: jendekExternalId,
@@ -481,8 +471,7 @@ router.post('/integration/clickthrough', (req, res, next) => {
     });
 })
 
-function generateFileUrl (req, mediaId, channel) {
-    let imgServer = "expo.bcaf.id"
+function generateFileUrl (mediaId, channel) {
     let url = "https://" + CIF_HOST + "/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpeg"
     return url
 }
