@@ -31,7 +31,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(httpContext.middleware);
 app.use((req, res, next) => {
-  httpContext.set('traceId', req.body.request_unique_identifier || uuid.v4())
+  const id = uuid.v4()
+  httpContext.set('traceId', id)
+  res.set('X-traceId', id)
   next()
 });
 app.use('/', indexRouter);
