@@ -21,7 +21,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // app.use(morgan('dev'));
-app.use(morgan("combined", { 
+app.use(morgan(":remote-addr :remote-user :method :url HTTP/:http-version :status :res[content-length] - :response-time ms :referrer :user-agent ", { 
   stream: { write: message => logger.info(message.trim()) },
   skip: (req, res) => req.originalUrl.startsWith("/jendek/integration/pull")
 }))
@@ -41,9 +41,6 @@ app.use('/proxy', proxyRouter);
 app.use('/mock', express.static(path.join(__dirname, 'public')))
 app.use('/wacoreproxy', proxy('192.168.29.189:9001')); 
 app.use('/wacoreproxygetimage', proxy('192.168.29.191:9010')); 
-app.use('/cifherokuproxy/:appname', proxy(req => req.params["appname"] + ".herokuapp.com", {https: true}))
-app.use('/cifngrokproxy/:appname', proxy(req => req.params["appname"] + ".ngrok.io", {https: true}))
-app.use('/example', proxyNew({ target: 'https://example.org', changeOrigin: true }));
 app.use('/wacoreproxyv2', proxyNew({ target: 'http://192.168.29.189:9001', changeOrigin: false }));
 
 // catch 404 and forward to error handler
