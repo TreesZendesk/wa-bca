@@ -45,18 +45,13 @@ app.use('/wacoreproxy', proxy('192.168.29.189:9001'));
 app.use('/wacoreproxygetimage', proxy('192.168.29.191:9010')); 
 app.use('/wacoreproxyv2', proxyNew({ target: 'http://192.168.29.189:9001', changeOrigin: false }));
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  console.log(req.headers)
-  next(createError(404));
-});
-
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
+  logger.debug(err)
   logger.error(err.stack)
   // render the error page
   res.status(err.status || 500);
