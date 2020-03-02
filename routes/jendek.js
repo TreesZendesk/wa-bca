@@ -9,25 +9,26 @@ var requestPromise = require('request-promise');
 const { check, validationResult } = require('express-validator');
 const httpContext = require('express-http-context');
 
-var jendek_domain_table = process.env.DOMAIN_TABLE || 'jendek-domain';
-
-var jendek_domain = process.env.ZENDESK_SUBDOMAIN || "bcafinancehelp1569566623"
-var jendek_group_agent_fieldid = process.env.GROUP_AGENT_FIELDID || "360030138314"
+const JENDEK_DOMAIN_TABLE = process.env.DOMAIN_TABLE || 'jendek-domain';
+const JENDEK_DOMAIN = process.env.ZENDESK_SUBDOMAIN || "bcafinancehelp1569566623"
+const JENDEK_GROUP_AGENT_FIELDID = process.env.GROUP_AGENT_FIELDID || "360030138314"
+const HOST = process.env.CIF_HOST || "expo.bcaf.id/zConnector"
+const CIF_ID = process.env.CIF_ID || "new-bca-zendesk-wa.uniquebcaf"
+const CIF_VERSION = process.env.CIF_VERSION || "v1.0.0";
+const CIF_PUSH_CLIENT_ID = process.env.CIF_PUSH_CLIENT_ID || "zd_trees_integration";
 
 router.get('/manifest', (req, res, next) => {
-    let host = process.env.CIF_HOST || "expo.bcaf.id/zConnector"
-
      res.status(200).send({
-        name: "WhatsApp-bca",
-        id: process.env.CIF_ID || "new-bca-zendesk-wa.uniquebcaf",
+        name: "WhatsApp-bcaf",
+        id: CIF_ID,
         author: "Trees Solutions",
-        version: process.env.CIF_VERSION || "v1.0.0",
-        push_client_id: process.env.CIF_PUSH_CLIENT_ID || "zd_trees_integration",
+        version: CIF_VERSION,
+        push_client_id: CIF_PUSH_CLIENT_ID,
         urls: {
-            admin_ui: "https://" + host + "/jendek/integration/admin",
-            pull_url: "https://" + host + "/jendek/integration/pull",
-            channelback_url: "https://" + host + "/jendek/integration/channelback",
-            clickthrough_url: "https://" + host + "/jendek/integration/clickthrough"
+            admin_ui: "https://" + HOST + "/jendek/integration/admin",
+            pull_url: "https://" + HOST + "/jendek/integration/pull",
+            channelback_url: "https://" + HOST + "/jendek/integration/channelback",
+            clickthrough_url: "https://" + HOST + "/jendek/integration/clickthrough"
         }
     })
 })
@@ -165,7 +166,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
 
     logger.info(JSON.stringify(externalRsrcs));
 
-    var pushJendekUrl = 'https://' + jendek_domain + '.zendesk.com/api/v2/any_channel/push.json';
+    var pushJendekUrl = 'https://' + JENDEK_DOMAIN + '.zendesk.com/api/v2/any_channel/push.json';
 
     request({
         url: pushJendekUrl,
@@ -227,7 +228,7 @@ router.post('/integration/push', (req, res, next) => {
         },
         fields: [
             {
-                id: jendek_group_agent_fieldid,
+                id: JENDEK_GROUP_AGENT_FIELDID,
                 value: fieldGroupAgent.replace(/[^a-zA-Z0-9\-]/g,'_').toLowerCase()
             }
         ],
@@ -242,7 +243,7 @@ router.post('/integration/push', (req, res, next) => {
 
 
     logger.info(externalRsrcs)
-    var pushJendekUrl = 'https://' + jendek_domain + '.zendesk.com/api/v2/any_channel/push.json';
+    var pushJendekUrl = 'https://' + JENDEK_DOMAIN + '.zendesk.com/api/v2/any_channel/push.json';
 
     request({
         url: pushJendekUrl,
@@ -481,7 +482,8 @@ router.post('/integration/clickthrough', (req, res, next) => {
 
 function generateFileUrl (req, mediaId, channel) {
     let imgServer = "expo.bcaf.id"
-    return "https://" + imgServer + "/zConnector/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpeg"
+    let url = "https://" + imgServer + "/zConnector/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpeg"
+    return url
 }
 
 module.exports = router;
