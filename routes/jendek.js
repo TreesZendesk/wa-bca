@@ -39,7 +39,7 @@ router.post('/integration/admin', [
     check('locale').exists(),
     check('subdomain').exists()
 ], (req, res, next) => {
-    logger.info(JSON.stringify(req.body));
+    logger.info("RequestBody: " + JSON.stringify(req.body));
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -64,7 +64,7 @@ router.post('/integration/register', [
     check('locale').exists(),
     check('sender').exists()
 ], (req, res, next) => {
-    logger.info(JSON.stringify(req.body));
+    logger.info("RequestBody: " + JSON.stringify(req.body));
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -92,7 +92,7 @@ router.post('/integration/register', [
 })
 
 router.post('/integration/push/from-core', (req, res, next) => {
-    logger.info(JSON.stringify(req.body));
+    logger.info("RequestBody: " + JSON.stringify(req.body));
     let externalRsrc = [];
     let externalRsrcs = {};
     let instance_push_id = req.body.push_id;
@@ -115,6 +115,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
         var jendekThreadExternalId = 'wa-conv-' + req.body.messages[i].from + "-" + sender
 
         if (msgType == "text") {
+            logger.info("message is text")
             msgObj = {
                 external_id: jendekExternalId,
                 message: req.body.messages[i].text.body,
@@ -127,6 +128,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
                 allow_channelback: true
             }
         } else if (msgType == "image") {
+            logger.info("message is image")
             var imageChannel = req.body.channel
             var imageId = req.body.messages[i].image.id
             var fileUrl = generateFileUrl(imageId, imageChannel)
@@ -155,10 +157,8 @@ router.post('/integration/push/from-core', (req, res, next) => {
         external_resources: externalRsrc
     }
 
-    logger.info(JSON.stringify(externalRsrcs));
-
     var pushJendekUrl = 'https://' + JENDEK_DOMAIN + '.zendesk.com/api/v2/any_channel/push.json';
-
+    logger.info("Calling " + pushJendekUrl + " Authorization Bearer: " + token_push + " Body: " + JSON.stringify(externalRsrcs));
     request({
         url: pushJendekUrl,
         method: 'POST',
@@ -168,7 +168,6 @@ router.post('/integration/push/from-core', (req, res, next) => {
         time: true,
         json: externalRsrcs
     }, function (err, newRes) {
-        logger.info("Called api/v2/any_channel/push");
         if (err) {
             logger.error(err)
             return res.status(500).send({
@@ -177,7 +176,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
             });
         }
 
-        logger.info(JSON.stringify({statusCode: newRes.statusCode, elapsedTime: newRes.elapsedTime + " ms", responseBody: newRes.body}))
+        logger.info("Called " + pushJendekUrl + " " + JSON.stringify({statusCode: newRes.statusCode, elapsedTime: newRes.elapsedTime + " ms", responseBody: newRes.body}))
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
@@ -193,7 +192,7 @@ router.post('/integration/push/from-core', (req, res, next) => {
 })
 
 router.post('/integration/push', (req, res, next) => {
-    logger.info(JSON.stringify(req.body));
+    logger.info("RequestBody: " + JSON.stringify(req.body));
 
     let externalRsrc = [];
     let externalRsrcs = {};
@@ -232,10 +231,9 @@ router.post('/integration/push', (req, res, next) => {
         external_resources: externalRsrc
     }
 
-
-    logger.info(externalRsrcs)
     var pushJendekUrl = 'https://' + JENDEK_DOMAIN + '.zendesk.com/api/v2/any_channel/push.json';
 
+    logger.info("Calling " + pushJendekUrl + " Authorization: Bearer " + token_push + " Body: " + JSON.stringify(externalRsrcs))
     request({
         url: pushJendekUrl,
         method: 'POST',
@@ -245,7 +243,6 @@ router.post('/integration/push', (req, res, next) => {
         time: true,
         json: externalRsrcs
     }, function (err, newRes) {
-        logger.info("Called api/v2/any_channel/push");
         if (err) {
             logger.error(err)
             return res.status(500).send({
@@ -254,7 +251,7 @@ router.post('/integration/push', (req, res, next) => {
             });
         }
 
-        logger.info(JSON.stringify({statusCode: newRes.statusCode, elapsedTime: newRes.elapsedTime + " ms", responseBody: newRes.body}))
+        logger.info("Called " + pushJendekUrl + " " + JSON.stringify({statusCode: newRes.statusCode, elapsedTime: newRes.elapsedTime + " ms", responseBody: newRes.body}));        
         if (newRes.statusCode == 200) {
             res.status(200).send({
                 external_id: jendekExternalId,
@@ -352,29 +349,34 @@ router.get('/testing-image', (req, res, next) => {
 })
 
 router.post('/integration/channelback', async (req, res, next) => {
-    logger.info(JSON.stringify(req.body))
-    let metadata = JSON.parse(req.body['metadata'])
-
+    logger.info("RequestBody: " + JSON.stringify(req.body));
+    let metadata = JSON.parse(req.body['metadata'])    
     // let push_id = metadata.instance_push_id
     // let token_id = metadata.token_id
     let to = req.body.thread_id.split("-")[2]
 
     if (!req.body["file_urls[]"]) {
-        request({
-            url: WA_URL + "/api/wa/v1/text/send",
-            method: 'POST',
-            json: {
-                "channelID": "102",
-                "terminalID": "100",
-                "sender": metadata.sender,
-                "customerRefNo": "999999999",
-                "recipient_type": "individual",
-                "to": to,
-                "type": "text",
-                "text": {
-                    "body": req.body.message
-                }
+        logger.info("request has no file urls")
+
+        let url = WA_URL + "/api/wa/v1/text/send"
+        let json = {
+            "channelID": "102",
+            "terminalID": "100",
+            "sender": metadata.sender,
+            "customerRefNo": "999999999",
+            "recipient_type": "individual",
+            "to": to,
+            "type": "text",
+            "text": {
+                "body": req.body.message
             }
+        }
+
+        logger.info("Calling " + url + " Body: " + JSON.stringify(json))
+        request({
+            url,
+            method: 'POST',
+            json
         }, function (error, chatRes) {
             if (error) {
                 logger.error(error)
@@ -384,6 +386,7 @@ router.post('/integration/channelback', async (req, res, next) => {
                 });
             }
 
+            logger.info("Called " + url + " " + JSON.stringify({statusCode: chatRes.statusCode, elapsedTime: chatRes.elapsedTime + " ms", responseBody: chatRes.body}));                        
             if (chatRes.body && chatRes.body.statusCode == "00") {
                 res.status(200).send({...chatRes.body, external_id: chatRes.body.transactionRefNo});
             } else {
@@ -394,11 +397,12 @@ router.post('/integration/channelback', async (req, res, next) => {
             }
         });
     } else {
+        logger.info("request has file urls")
         // let fileUrl = req.body["file_urls[]"] instanceof Array ? req.body["file_urls[]"][0] : req.body["file_urls[]"]
         let fileUrl = ''
         let fileUrls = req.body["file_urls[]"]
         let urls = fileUrls instanceof Array ? fileUrls : [fileUrls]
-        logger.info(urls)
+        logger.info("file_urls: " + JSON.stringify(urls))
 
         for (var i=0; i<urls.length; i++) {
             let newFileUrl = urls[i]
@@ -410,20 +414,20 @@ router.post('/integration/channelback', async (req, res, next) => {
                 customerRefNo: "999999999",
                 sender: metadata.sender
             }
+            var uri = WA_URL + '/api/wa/v1/media/upload' 
             var uploadMedia = {
                 method: 'POST',
-                uri: WA_URL + '/api/wa/v1/media/upload',
+                uri: uri,
                 formData: formData,
             };
-
+            logger.info("Calling " + uri)
             let uploadRes = await requestPromise(uploadMedia)
-            logger.info(uploadRes)
             let uploadResponse = JSON.parse(uploadRes)
-
+            logger.info("Called " + uri + " Response: " + JSON.stringify(uploadResponse))
             if (uploadResponse.statusCode == "00") {
                 let uploadId = uploadResponse.media[0].id
                 
-                logger.info(uploadId)
+                logger.info("UploadId: " + uploadId)
 
                 let imgCaption = ''
                 if ((i+1) == urls.length) {
@@ -431,29 +435,34 @@ router.post('/integration/channelback', async (req, res, next) => {
                 } else {
                     imgCaption = ''
                 }
-                var sendMessage = {
-                    url: WA_URL + "/api/wa/v1/media/send",
-                    method: 'POST',
-                    json: {
-                        "channelID": "102",
-                        "terminalID": "100",
-                        "sender": metadata.sender,
-                        "customerRefNo": "999999999",
-                        "recipient_type": "individual",
-                        "to": to,
-                        "type": "image",
-                        "image": {
-                            "id": uploadId,
-                            "caption": imgCaption
-                        }
+                var url = WA_URL + "/api/wa/v1/media/send" 
+                var json = {
+                    "channelID": "102",
+                    "terminalID": "100",
+                    "sender": metadata.sender,
+                    "customerRefNo": "999999999",
+                    "recipient_type": "individual",
+                    "to": to,
+                    "type": "image",
+                    "image": {
+                        "id": uploadId,
+                        "caption": imgCaption
                     }
                 }
+                var sendMessage = {
+                    url: url,
+                    method: 'POST',
+                    json: json
+                }
 
+                logger.info("Calling " + url + " Body: " + JSON.stringify(json))
                 let chatResponse = await requestPromise(sendMessage)
+                logger.info("Called " + url + " Response: " + JSON.stringify(chatResponse))
                 if ((i+1) == urls.length) {
                     if (chatResponse.statusCode == "00") {
                         res.status(200).send({...chatResponse, external_id: chatResponse.transactionRefNo});
                     } else {
+                        logger.error(JSON.stringify(chatResponse))
                         res.status(500).send({
                             error: "error",
                         });
