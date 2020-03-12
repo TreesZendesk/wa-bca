@@ -13,8 +13,8 @@ const CIF_HOST = process.env.CIF_HOST || "expo.bcaf.id/zConnector"
 const CIF_ID = process.env.CIF_ID || "new-bca-zendesk-wa.uniquebcaf"
 const CIF_VERSION = process.env.CIF_VERSION || "v1.0.0";
 const CIF_PUSH_CLIENT_ID = process.env.CIF_PUSH_CLIENT_ID || "zd_trees_integration";
-const WA_URL = process.env.WA_URL || "http://192.168.29.189:9001"
-const WA_MEDIA_URL = process.env.WA_MEDIA_URL || "http://192.168.29.191:9010"
+const WA_URL = process.env.WA_URL || "192.168.29.189:9001"
+const WA_MEDIA_URL = process.env.WA_MEDIA_URL || "192.168.29.191:9010"
 
 router.get('/manifest', (req, res, next) => {
      res.status(200).send({
@@ -280,7 +280,7 @@ const getMedia = async ({ params }, res) => {
     logger.info(JSON.stringify(getChannel));
 
     request({
-        url: WA_MEDIA_URL + "/api/wa/v1/media/get",
+        url: "http://" + WA_MEDIA_URL + "/api/wa/v1/media/get",
         rejectUnauthorized: false,
         method: 'POST',
         json: {
@@ -323,7 +323,7 @@ router.get('/testing-image', (req, res, next) => {
 
         const uploadImageRequest = {
             method: "POST",
-            url: WA_URL + "/api/wa/v1/media/upload",
+            url: "http://" + WA_URL + "/api/wa/v1/media/upload",
             headers: {
                 "Content-Type": "multipart/form-data"
             },
@@ -358,7 +358,7 @@ router.post('/integration/channelback', async (req, res, next) => {
     if (!req.body["file_urls[]"]) {
         logger.info("request has no file urls")
 
-        let url = WA_URL + "/api/wa/v1/text/send"
+        let url = "http://" + WA_URL + "/api/wa/v1/text/send"
         let json = {
             "channelID": "102",
             "terminalID": "100",
@@ -414,7 +414,7 @@ router.post('/integration/channelback', async (req, res, next) => {
                 customerRefNo: "999999999",
                 sender: metadata.sender
             }
-            var uri = WA_URL + '/api/wa/v1/media/upload' 
+            var uri = "http://" + WA_URL + '/api/wa/v1/media/upload' 
             var uploadMedia = {
                 method: 'POST',
                 uri: uri,
@@ -435,7 +435,7 @@ router.post('/integration/channelback', async (req, res, next) => {
                 } else {
                     imgCaption = ''
                 }
-                var url = WA_URL + "/api/wa/v1/media/send" 
+                var url = "http://" + WA_URL + "/api/wa/v1/media/send" 
                 var json = {
                     "channelID": "102",
                     "terminalID": "100",
