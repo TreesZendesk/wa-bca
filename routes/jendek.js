@@ -488,8 +488,10 @@ function generateFileUrl (mediaId, channel) {
 
 router.get('/test123',async (req, res, next) => {
     let newFileUrl = 'https://bcafinancehelp1569566623.zendesk.com/attachments/token/AWaDM8Dv2HQsSLw16UOWxfZgt/?name=dios_main_logo.jpg'
+    logger.info('getting image');
     request.get(newFileUrl, async function (err, responseFile, bodyFile) {
-        console.log(bodyFile)
+        // console.log(bodyFile)
+        logger.info(bodyFile);
         var formData = {
             mediaType: "image",
             file: bodyFile,
