@@ -4,7 +4,7 @@ const request = require('request');
 const uuid = require('uuid');
 const logger = require('../config/winston')
 var requestPromise = require('request-promise');
-const { check, validationResult } = require('express-validator');
+const { check, validationResult, body } = require('express-validator');
 const httpContext = require('express-http-context');
 
 const JENDEK_DOMAIN = process.env.ZENDESK_SUBDOMAIN || "bcafinancehelp1569566623"
@@ -473,27 +473,6 @@ router.post('/integration/channelback', async (req, res, next) => {
     }
 })
 
-router.get('/test123', (req, res, next) => {
-    let newFileUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png'
-    var formData = {
-        mediaType: "image",
-        file: request(newFileUrl),
-        channelID: 102,
-        terminalID: 100,
-        customerRefNo: "999999999",
-        sender: metadata.sender
-    }
-    var uri = "http://" + WA_URL + '/api/wa/v1/media/upload' 
-    var uploadMedia = {
-        method: 'POST',
-        uri: uri,
-        formData: formData,
-    };
-    logger.info("Calling " + uri)
-    let uploadRes = await requestPromise(uploadMedia)
-    let uploadResponse = JSON.parse(uploadRes)
-    logger.info("Called " + uri + " Response: " + JSON.stringify(uploadResponse))
-})
 
 router.post('/integration/clickthrough', (req, res, next) => {
     logger.info(JSON.stringify(req.body))
@@ -506,5 +485,36 @@ function generateFileUrl (mediaId, channel) {
     let url = "https://" + CIF_HOST + "/jendek/getmedia/" + mediaId + "/" + channel + "/image.jpeg"
     return url
 }
+
+router.get('/test123',async (req, res, next) => {
+    let newFileUrl = 'https://bcafinancehelp1569566623.zendesk.com/attachments/token/AWaDM8Dv2HQsSLw16UOWxfZgt/?name=dios_main_logo.jpg'
+    request.get(newFileUrl, async function (err, responseFile, bodyFile) {
+        console.log(bodyFile)
+        var formData = {
+            mediaType: "image",
+            file: bodyFile,
+            channelID: 102,
+            terminalID: 100,
+            customerRefNo: '999999999',
+            sender: 'FINANCE'
+        }
+        var uri = "http://" + WA_URL + '/api/wa/v1/media/upload' 
+        var uploadMedia = {
+            method: 'POST',
+            uri: uri,
+            formData: formData,
+        };
+        // console.log(formData)
+        logger.info("Calling " + uri)
+        try {
+            let uploadRes = await requestPromise(uploadMedia)
+            let uploadResponse = JSON.parse(uploadRes)
+            logger.info("Called " + uri + " Response: " + JSON.stringify(uploadResponse))
+            res.status(200).send(uploadResponse)
+        } catch (error) {
+            console.log(error)
+        }
+    })
+})
 
 module.exports = router;
