@@ -490,32 +490,32 @@ router.get('/test123',async (req, res, next) => {
     let newFileUrl = 'https://bcafinancehelp1569566623.zendesk.com/attachments/token/AWaDM8Dv2HQsSLw16UOWxfZgt/?name=dios_main_logo.jpg'
     logger.info('getting image');
     request.get(newFileUrl, async function (err, responseFile, bodyFile) {
-        // console.log(bodyFile)
-        logger.info(bodyFile);
-        var formData = {
-            mediaType: "image",
-            file: bodyFile,
-            channelID: 102,
-            terminalID: 100,
-            customerRefNo: '999999999',
-            sender: 'FINANCE'
-        }
-        var uri = "http://" + WA_URL + '/api/wa/v1/media/upload' 
-        var uploadMedia = {
-            method: 'POST',
-            uri: uri,
-            formData: formData,
-        };
-        // console.log(formData)
-        logger.info("Calling " + uri)
-        try {
-            let uploadRes = await requestPromise(uploadMedia)
-            let uploadResponse = JSON.parse(uploadRes)
-            logger.info("Called " + uri + " Response: " + JSON.stringify(uploadResponse))
-            res.status(200).send(uploadResponse)
-        } catch (error) {
-            console.log(error)
-        }
+        logger.info(JSON.stringify(responseFile));
+        // console.log(responseFile)
+        // var formData = {
+        //     mediaType: "image",
+        //     file: bodyFile,
+        //     channelID: 102,
+        //     terminalID: 100,
+        //     customerRefNo: '999999999',
+        //     sender: 'FINANCE'
+        // }
+        // var uri = "http://" + WA_URL + '/api/wa/v1/media/upload' 
+        // var uploadMedia = {
+        //     method: 'POST',
+        //     uri: uri,
+        //     formData: formData,
+        // };
+        // // console.log(formData)
+        // logger.info("Calling " + uri)
+        // try {
+        //     let uploadRes = await requestPromise(uploadMedia)
+        //     let uploadResponse = JSON.parse(uploadRes)
+        //     logger.info("Called " + uri + " Response: " + JSON.stringify(uploadResponse))
+        //     res.status(200).send(uploadResponse)
+        // } catch (error) {
+        //     console.log(error)
+        // }
     })
 })
 
