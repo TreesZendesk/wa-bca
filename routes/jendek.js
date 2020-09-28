@@ -6,6 +6,7 @@ const logger = require('../config/winston')
 var requestPromise = require('request-promise');
 const { check, validationResult, body } = require('express-validator');
 const httpContext = require('express-http-context');
+const axios = require('axios');
 
 const JENDEK_DOMAIN = process.env.ZENDESK_SUBDOMAIN || "bcafinancehelp1569566623"
 const JENDEK_GROUP_AGENT_FIELDID = process.env.GROUP_AGENT_FIELDID || "360030138314"
@@ -489,8 +490,8 @@ function generateFileUrl (mediaId, channel) {
 router.get('/test123',async (req, res, next) => {
     let newFileUrl = 'https://bcafinancehelp1569566623.zendesk.com/attachments/token/AWaDM8Dv2HQsSLw16UOWxfZgt/?name=dios_main_logo.jpg'
     logger.info('getting image');
-    request.get(newFileUrl, async function (err, responseFile, bodyFile) {
-        logger.info(JSON.stringify(responseFile));
+    // request.get(newFileUrl, async function (err, responseFile, bodyFile) {
+    //     logger.info(JSON.stringify(responseFile));
         // console.log(responseFile)
         // var formData = {
         //     mediaType: "image",
@@ -516,7 +517,13 @@ router.get('/test123',async (req, res, next) => {
         // } catch (error) {
         //     console.log(error)
         // }
-    })
+    // })
+    axios.get(newFileUrl).then(response => {
+        // logger.info(response.data); // Blank
+        logger.info(response.status); // False 
+        logger.info(response.data);
+        // console.log(base64.encode(response.data)); // Blank
+    }).catch(err => logger.info(err));
 })
 
 module.exports = router;
