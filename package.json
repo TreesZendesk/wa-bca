@@ -24,7 +24,7 @@
     "node-uuid": "^1.4.8",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
-    "sanitize-html": "^1.20.1",
+    "sanitize-html": "^2.3.2",
     "sequelize": "^5.19.2",
     "uuid": "^3.3.3",
     "winston-daily-rotate-file": "^4.4.2",
